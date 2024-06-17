@@ -1,0 +1,286 @@
+package com.sundayting.composeanimation.ui.main
+
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.InfiniteRepeatableSpec
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.VectorConverter
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.animateValue
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.sharp.KeyboardArrowDown
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import com.sundayting.composeanimation.R
+
+object MainPage {
+
+    const val ROUTE = "main_page"
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun Screen(
+        modifier: Modifier = Modifier,
+        navHostController: NavHostController,
+    ) {
+
+        Scaffold(
+            modifier = modifier,
+            topBar = {
+                TopAppBar(
+                    title = { Text("Jetpack Compose动画小课堂") },
+                )
+            }
+        ) {
+
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(it),
+                contentPadding = PaddingValues(start = 15.dp, end = 15.dp, bottom = 40.dp)
+            ) {
+                item(span = { GridItemSpan(2) }, key = "这是什么") {
+                    ElevatedCard(Modifier.padding(bottom = 20.dp)) {
+                        var expandMore by remember {
+                            mutableStateOf(false)
+                        }
+                        Box(Modifier.fillMaxWidth()) {
+                            val buttonRotateAngle by animateFloatAsState(
+                                targetValue = if (expandMore) 180f else 0f,
+                                label = ""
+                            )
+                            Box(
+                                Modifier
+                                    .fillMaxWidth()
+                                    .aspectRatio(4f / 2f)
+                                    .clip(CardDefaults.elevatedShape)
+                                    .shadow(elevation = 5.dp)
+                            ) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.main_page_2),
+                                    contentDescription = null,
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.Crop
+                                )
+                                Box(
+                                    Modifier
+                                        .align(Alignment.BottomCenter)
+                                        .fillMaxWidth()
+                                        .height(80.dp)
+                                        .background(
+                                            Brush.verticalGradient(
+                                                listOf(Color.Transparent, Color.Black)
+                                            )
+                                        )
+                                )
+                            }
+
+                            val titleTransition = rememberInfiniteTransition(label = "")
+                            val titleOffset by titleTransition.animateValue(
+                                initialValue = 0.dp,
+                                targetValue = 25.dp,
+                                typeConverter = Dp.VectorConverter,
+                                animationSpec = remember {
+                                    InfiniteRepeatableSpec(
+                                        animation = tween(durationMillis = 2_000),
+                                        repeatMode = RepeatMode.Reverse
+                                    )
+                                }, label = ""
+                            )
+                            Row(
+                                Modifier
+                                    .fillMaxWidth()
+                                    .align(Alignment.BottomCenter)
+                                    .padding(10.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                FilledIconButton(
+                                    onClick = { expandMore = !expandMore },
+                                    modifier = Modifier.graphicsLayer {
+                                        rotationZ = buttonRotateAngle
+                                    }
+                                ) {
+                                    Icon(Icons.Sharp.KeyboardArrowDown, contentDescription = null)
+                                }
+                                Text(
+                                    text = "👈🏻这个应用的目的是什么？",
+                                    modifier = Modifier
+                                        .offset {
+                                            IntOffset(titleOffset.roundToPx(), 0)
+                                        },
+                                    style = TextStyle(
+                                        fontSize = 20.sp,
+                                        color = MaterialTheme.colorScheme.inverseOnSurface
+                                    )
+                                )
+                                Spacer(
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .weight(1f, false)
+                                )
+                            }
+                        }
+                        AnimatedVisibility(visible = expandMore) {
+                            CompositionLocalProvider(
+                                LocalTextStyle provides MaterialTheme.typography.bodyMedium.copy(
+                                    color = MaterialTheme.colorScheme.secondary
+                                )
+                            ) {
+                                Column(Modifier.padding(10.dp)) {
+                                    Text(
+                                        modifier = Modifier.padding(vertical = 15.dp),
+                                        text = "结合理论+代码+实际场景的方式让读者入门并精通Compose动画。",
+                                        style = MaterialTheme.typography.titleMedium
+                                    )
+                                    Text("📚 只需要简单的理论基础。")
+                                    Text("💻 每个案例均有对应的代码，可以动手微调练习。")
+                                    Text("🌄 只会知识却不会如何在项目中使用？这里为常见场景提供了模版代码！")
+                                }
+                            }
+
+                        }
+
+                    }
+                }
+                item(span = { GridItemSpan(2) }, key = "为什么要使用动画") {
+                    ElevatedCard {
+                        var expandMore by remember {
+                            mutableStateOf(false)
+                        }
+                        Box(Modifier.fillMaxWidth()) {
+
+                            val buttonRotateAngle by animateFloatAsState(
+                                targetValue = if (expandMore) 180f else 0f,
+                                label = ""
+                            )
+                            Image(
+                                painter = painterResource(id = R.drawable.main_page_1),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .aspectRatio(4f / 2f)
+                                    .clip(CardDefaults.elevatedShape)
+                                    .shadow(elevation = 5.dp),
+                                contentScale = ContentScale.Crop
+                            )
+                            val titleTransition = rememberInfiniteTransition(label = "")
+                            val titleOffset by titleTransition.animateValue(
+                                initialValue = 0.dp,
+                                targetValue = 25.dp,
+                                typeConverter = Dp.VectorConverter,
+                                animationSpec = remember {
+                                    InfiniteRepeatableSpec(
+                                        animation = tween(durationMillis = 2_000),
+                                        repeatMode = RepeatMode.Reverse
+                                    )
+                                }, label = ""
+                            )
+                            Row(
+                                Modifier
+                                    .fillMaxWidth()
+                                    .align(Alignment.BottomCenter)
+                                    .padding(10.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = "为什么要使用动画？👉🏻",
+                                    modifier = Modifier
+                                        .offset {
+                                            IntOffset(titleOffset.roundToPx(), 0)
+                                        },
+                                    style = TextStyle(
+                                        fontSize = 20.sp,
+                                        color = MaterialTheme.colorScheme.inverseOnSurface
+                                    )
+                                )
+                                Spacer(
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .weight(1f, false)
+                                )
+                                FilledIconButton(
+                                    onClick = { expandMore = !expandMore },
+                                    modifier = Modifier.graphicsLayer {
+                                        rotationZ = buttonRotateAngle
+                                    }
+                                ) {
+                                    Icon(Icons.Sharp.KeyboardArrowDown, contentDescription = null)
+                                }
+                            }
+                        }
+                        AnimatedVisibility(visible = expandMore) {
+                            CompositionLocalProvider(
+                                LocalTextStyle provides MaterialTheme.typography.bodyMedium.copy(
+                                    color = MaterialTheme.colorScheme.secondary
+                                )
+                            ) {
+                                Column(Modifier.padding(10.dp)) {
+                                    Text(
+                                        modifier=Modifier.padding(vertical = 10.dp),
+                                        text="动画是移动应用程序的基础，它为用户提供流畅的用户体验。",
+                                        style = MaterialTheme.typography.titleMedium
+                                    )
+                                    Text("🚀 增强的用户体验：动画使 UI 更具交互性和吸引力。")
+                                    Text("👁 视觉反馈：提供视觉提示，使应用程序更加直观。")
+                                    Text("📱 美观：精心设计的动画可以让应用脱颖而出。")
+                                }
+                            }
+
+                        }
+
+                    }
+                }
+            }
+        }
+
+
+    }
+
+}
