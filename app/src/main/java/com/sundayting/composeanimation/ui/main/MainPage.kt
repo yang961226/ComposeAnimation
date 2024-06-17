@@ -2,14 +2,17 @@ package com.sundayting.composeanimation.ui.main
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.InfiniteRepeatableSpec
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.VectorConverter
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.animateValue
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -21,15 +24,19 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.GridItemSpan
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.sharp.KeyboardArrowDown
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
@@ -52,6 +59,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -74,20 +82,30 @@ object MainPage {
             modifier = modifier,
             topBar = {
                 TopAppBar(
-                    title = { Text("Jetpack Compose动画小课堂") },
+                    title = {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Image(
+                                painterResource(id = R.drawable.jetpack_compose_icon),
+                                contentDescription = null,
+                                modifier = Modifier.size(40.dp)
+                            )
+                            Spacer(Modifier.width(10.dp))
+                            Text("Jetpack Compose动画小课堂")
+                        }
+                    },
                 )
             }
         ) {
 
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
+            LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(it),
-                contentPadding = PaddingValues(start = 15.dp, end = 15.dp, bottom = 40.dp)
+                contentPadding = PaddingValues(start = 15.dp, end = 15.dp, bottom = 40.dp),
+                verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
-                item(span = { GridItemSpan(2) }, key = "这是什么") {
-                    ElevatedCard(Modifier.padding(bottom = 20.dp)) {
+                item(key = "这是什么") {
+                    ElevatedCard {
                         var expandMore by remember {
                             mutableStateOf(false)
                         }
@@ -189,7 +207,7 @@ object MainPage {
 
                     }
                 }
-                item(span = { GridItemSpan(2) }, key = "为什么要使用动画") {
+                item(key = "为什么要使用动画") {
                     ElevatedCard {
                         var expandMore by remember {
                             mutableStateOf(false)
@@ -263,8 +281,8 @@ object MainPage {
                             ) {
                                 Column(Modifier.padding(10.dp)) {
                                     Text(
-                                        modifier=Modifier.padding(vertical = 10.dp),
-                                        text="动画是移动应用程序的基础，它为用户提供流畅的用户体验。",
+                                        modifier = Modifier.padding(vertical = 10.dp),
+                                        text = "动画是移动应用程序的基础，它为用户提供流畅的用户体验。",
                                         style = MaterialTheme.typography.titleMedium
                                     )
                                     Text("🚀 增强的用户体验：动画使 UI 更具交互性和吸引力。")
@@ -277,10 +295,98 @@ object MainPage {
 
                     }
                 }
+                item {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        HorizontalDivider(
+                            Modifier
+                                .weight(1f, false)
+                                .padding(end = 10.dp)
+                        )
+                        Text(
+                            "码上开始", style = MaterialTheme.typography.titleLarge.copy(
+                                fontWeight = FontWeight.Bold
+                            )
+                        )
+                        HorizontalDivider(
+                            Modifier
+                                .weight(1f, false)
+                                .padding(start = 10.dp)
+                        )
+                    }
+                }
+                item {
+                    Text("动画目录分类：", style = MaterialTheme.typography.titleLarge)
+                }
+                item(key = "Value-based动画") {
+                    CategoriesItem(title = { Text("Value-based动画") }, onClick = {})
+                }
+                item(key = "定制型动画Animatable") {
+                    CategoriesItem(title = { Text("定制型动画Animatable") }, onClick = {})
+                }
+                item(key = "动画Modifier以及动画可组合项") {
+                    CategoriesItem(title = { Text("动画Modifier、\n动画可组合项") }, onClick = {})
+                }
             }
         }
 
 
     }
 
+}
+
+@Composable
+private fun CategoriesItem(
+    modifier: Modifier = Modifier,
+    title: @Composable () -> Unit,
+    onClick: () -> Unit,
+) {
+    Card(
+        modifier
+            .fillMaxWidth()
+    ) {
+        val imageTransition = rememberInfiniteTransition(label = "")
+        val imageRotate by imageTransition.animateFloat(
+            initialValue = 0f,
+            targetValue = 360f,
+            animationSpec = remember {
+                InfiniteRepeatableSpec(
+                    animation = tween(
+                        durationMillis = 10_000,
+                        easing = LinearEasing
+                    ),
+                    repeatMode = RepeatMode.Restart
+                )
+            }, label = ""
+        )
+        Row(
+            Modifier.padding(10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            CompositionLocalProvider(
+                LocalTextStyle provides MaterialTheme.typography.titleLarge
+            ) {
+                title()
+            }
+            Spacer(Modifier.width(10.dp))
+            Icon(
+                modifier = Modifier.graphicsLayer {
+                    rotationZ = imageRotate
+                },
+                imageVector = Icons.Filled.Settings,
+                contentDescription = null
+            )
+            Spacer(
+                Modifier
+                    .fillMaxWidth()
+                    .weight(1f, false)
+            )
+            FilledIconButton(onClick = onClick) {
+                Icon(
+                    Icons.AutoMirrored.Default.ArrowForward,
+                    contentDescription = null
+                )
+            }
+        }
+
+    }
 }
