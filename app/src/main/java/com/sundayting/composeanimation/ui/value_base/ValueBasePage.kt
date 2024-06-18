@@ -59,6 +59,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
@@ -90,7 +91,7 @@ object ValueBasePage {
                     IconButton(onClick = { navHostController.popBackStack() }) {
                         Icon(Icons.AutoMirrored.Default.ArrowBack, contentDescription = null)
                     }
-                }
+                },
             )
         }) {
             LazyColumn(
@@ -106,10 +107,12 @@ object ValueBasePage {
                 verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
                 item("1") {
-                    Text(
-                        "📚 animate*AsState函数是 Compose 中最简单的动画 API，用于对单个值进行动画处理。\n您只需提供目标值（或最终值），API 就会开始从当前值到指定值的动画。",
-                        style = MaterialTheme.typography.titleMedium
-                    )
+                    Card {
+                        Text(
+                            "📚 animate*AsState函数是 Compose 中最简单的动画 API，用于对单个值进行动画处理。\n您只需提供目标值（或最终值），API 就会开始从当前值到指定值的动画。",
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                    }
                 }
                 item("2") {
                     Block2()
@@ -123,6 +126,12 @@ object ValueBasePage {
                 item {
                     HorizontalDivider()
                 }
+                item("3.1") {
+                    Block3_1()
+                }
+                item {
+                    HorizontalDivider()
+                }
                 item("4") {
                     Block4()
                 }
@@ -132,8 +141,11 @@ object ValueBasePage {
                 item("5") {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
-                            "📚 上面只提到了如何使用animate*AsState()来为不同状态之间的迁移提供最新的动画值，但是动画的「差值」如何修改的呢？在讲这个之前，先通过几个不同的案例来对比不同差值的区别：",
+                            "📚 AnimationSpec(the specification of an animation)，动画规格",
                             style = MaterialTheme.typography.titleMedium
+                        )
+                        Text(
+                            "动画规格（Spec）影响了动画在往目标值移动的过程中的具体运行逻辑，不同的Spec可以让动画产生不同的效果，下面通过实际案例看看他们的差异"
                         )
 
                         var toTarget by remember {
@@ -144,12 +156,14 @@ object ValueBasePage {
                             modifier = Modifier.padding(vertical = 10.dp),
                             verticalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
+                            Text("tween（补间动画——快进慢出）")
                             AnimateDpExampleRow(
                                 toTarget = toTarget,
                                 animationSpec = tween(
                                     durationMillis = 500
                                 )
                             )
+                            Text("tween（补间动画——线性）")
                             AnimateDpExampleRow(
                                 toTarget = toTarget,
                                 animationSpec = tween(
@@ -157,9 +171,10 @@ object ValueBasePage {
                                     durationMillis = 500
                                 )
                             )
+                            Text("keyframe（关键帧动画）")
                             AnimateDpExampleRow(
                                 toTarget = toTarget,
-                                animationSpec = if(toTarget){
+                                animationSpec = if (toTarget) {
                                     keyframes {
                                         durationMillis = 500
                                         0.dp at 0 using LinearOutSlowInEasing // for 0-15 ms
@@ -167,7 +182,7 @@ object ValueBasePage {
                                         100.dp at 400 // ms
                                         150.dp at 500 // ms
                                     }
-                                }else{
+                                } else {
                                     keyframes {
                                         durationMillis = 500
                                         150.dp at 0 using LinearOutSlowInEasing // for 0-15 ms
@@ -177,6 +192,7 @@ object ValueBasePage {
                                     }
                                 }
                             )
+                            Text("弹簧动画")
                             AnimateDpExampleRow(
                                 toTarget = toTarget,
                                 animationSpec = spring(
@@ -189,9 +205,66 @@ object ValueBasePage {
                         Button(onClick = { toTarget = !toTarget }) {
                             Text("点我开始动画")
                         }
+                        Box(Modifier.height(10.dp))
+                        Text(
+                            "💡 1、tween",
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier.align(Alignment.Start)
+                        )
+                        Text(
+                            "       tween必须在规定的时间内完成，它的动画效果是基于时间参数计算的，可以使用 Easing 来指定不同的时间曲线动画效果。可以使用 tween() 方法进行创建。"
+                        )
+                        Image(
+                            painter = painterResource(id = R.drawable.valuebase_3_2),
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxWidth(),
+                            contentScale = ContentScale.FillWidth
+                        )
+                        Text(
+                            """
+                                
+                                💡「durationMillis」表示动画的持续时间。
+                                
+                                💡「delayMillis」表示动画延迟时间。
+                                
+                                💡「easing」 动画曲线变化。
+                            """.trimIndent(),
+                            modifier = Modifier.align(Alignment.Start)
+                        )
                     }
                 }
             }
+        }
+
+    }
+
+    @Composable
+    private fun Block3_1() {
+        Column {
+            Text(
+                "📚 下面从animateDpAsState()了解如何使用如何使用animate*AsState()",
+                style = MaterialTheme.typography.titleMedium
+            )
+            Image(
+                painter = painterResource(id = R.drawable.valuebase_3_1),
+                contentDescription = null,
+                modifier = Modifier.fillMaxWidth(),
+                contentScale = ContentScale.FillWidth
+            )
+            Text(
+                """
+                
+                💡「targetValue」表示动画的目标值。
+                
+                💡「animationSpec」 动画规格，决定了动画的执行逻辑。
+                
+                💡「label」 这个参数是为了区别在 Android Studio 中进行动画预览时，区别其它动画的。
+                
+                💡「finishedListener 」可以用来监听动画的结束。
+                
+            """.trimIndent()
+            )
+            Text("通常情况下，开发者只需要关注「targetValue」和「animationSpec」即可，上文中填入的值即targetValue，而animationSpec暂不展开，下文会集中讨论。")
         }
 
     }
@@ -216,7 +289,7 @@ object ValueBasePage {
             Box(
                 Modifier
                     .offset {
-                        IntOffset(offsetDp.roundToPx(),0)
+                        IntOffset(offsetDp.roundToPx(), 0)
                     }
                     .size(50.dp)
                     .background(Color.Red.copy(0.2f))
