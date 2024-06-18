@@ -206,7 +206,10 @@ object ValueBasePage {
                         Button(onClick = { toTarget = !toTarget }) {
                             Text("点我开始动画")
                         }
-                        Box(Modifier.height(10.dp))
+                    }
+                }
+                item("6"){
+                    Column{
                         Card {
                             Column(Modifier.padding(10.dp)) {
 
@@ -360,7 +363,10 @@ object ValueBasePage {
                             }
 
                         }
-
+                    }
+                }
+                item("7"){
+                    Column(horizontalAlignment = Alignment.CenterHorizontally){
                         Card(Modifier.padding(vertical = 20.dp)) {
                             Column(Modifier.padding(10.dp)) {
 
@@ -384,47 +390,43 @@ object ValueBasePage {
 
                         KeyFrameExample(
                             modifier = Modifier
-                                .align(Alignment.CenterHorizontally)
                                 .padding(top = 40.dp, bottom = 20.dp),
                             toTarget = keyFrameTarget
                         )
 
                         Button(
                             onClick = { keyFrameTarget = !keyFrameTarget },
-                            modifier = Modifier.align(Alignment.CenterHorizontally)
                         ) {
                             Text("点我开始")
                         }
+                    }
 
-                        Spacer(Modifier.height(20.dp))
+                    Spacer(Modifier.height(20.dp))
 
-                        Column(
-                            Modifier.align(Alignment.Start),
-                            verticalArrangement = Arrangement.spacedBy(10.dp)
-                        ) {
-                            Text("keyframe的设置稍微绕一点，让我们看一看上面动画的keyframe是如何设置的")
-                            Image(
-                                painter = painterResource(id = R.drawable.valuebase_3_6),
-                                contentDescription = null,
-                                contentScale = ContentScale.FillWidth,
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                            Text("首先通过durationMills设置整个动画的运行时间，然后通过「at」和「using」两个中缀表达式来分别设置时间区间和区间对应的Easing。\n\n然而令人困惑的是，at后面接着的是一个时间点，并不是时间段，那么at 0指的是哪个时间段呢，实际上在keyframe的设置中，at 0指的是「设置的时间段是0到下一个时间段」这个时间段，因此上述代码指的是0-1000这个时间段。\n\n因此，上述的代码中，0-1秒的时间段设置了线性，1-2秒的时间段设置了快进慢出，2-3秒的时间段设置了线性。")
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        Text("keyframe的设置稍微绕一点，让我们看一看上面动画的keyframe是如何设置的")
+                        Image(
+                            painter = painterResource(id = R.drawable.valuebase_3_6),
+                            contentDescription = null,
+                            contentScale = ContentScale.FillWidth,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        Text("首先通过durationMills设置整个动画的运行时间，然后通过「at」和「using」两个中缀表达式来分别设置时间区间和区间对应的Easing。\n\n然而令人困惑的是，at后面接着的是一个时间点，并不是时间段，那么at 0指的是哪个时间段呢，实际上在keyframe的设置中，at 0指的是「设置的时间段是0到下一个时间段」这个时间段，因此上述代码指的是0-1000这个时间段。\n\n因此，上述的代码中，0-1秒的时间段设置了线性，1-2秒的时间段设置了快进慢出，2-3秒的时间段设置了线性。")
 
-                            Card {
-                                Text(
-                                    "⚠️与tween不同的是，由于keyframe的设置过程中，时间段和运行的目标是绑定的，因此不能很好支持动画的逆向，如果想支持运行过程逆向的keyframe动画，只能反着写一段，参考下面的代码：",
-                                    modifier = Modifier.padding(10.dp)
-                                )
-                            }
-                            Image(
-                                painter = painterResource(id = R.drawable.valuebase_3_7),
-                                contentDescription = null,
-                                contentScale = ContentScale.FillWidth,
-                                modifier = Modifier.fillMaxWidth()
+                        Card {
+                            Text(
+                                "⚠️与tween不同的是，由于keyframe的设置过程中，时间段和运行的目标是绑定的，因此不能很好支持动画的逆向，如果想支持运行过程逆向的keyframe动画，只能反着写一段，参考下面的代码：",
+                                modifier = Modifier.padding(10.dp)
                             )
                         }
-
+                        Image(
+                            painter = painterResource(id = R.drawable.valuebase_3_7),
+                            contentDescription = null,
+                            contentScale = ContentScale.FillWidth,
+                            modifier = Modifier.fillMaxWidth()
+                        )
                     }
                 }
             }
