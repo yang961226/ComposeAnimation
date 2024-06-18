@@ -1,8 +1,11 @@
 package com.sundayting.composeanimation.ui.value_base
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.InfiniteRepeatableSpec
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.LinearOutSlowInEasing
@@ -25,6 +28,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -60,6 +64,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
@@ -106,14 +111,6 @@ object ValueBasePage {
                 ),
                 verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
-                item("1") {
-                    Card {
-                        Text(
-                            "📚 animate*AsState函数是 Compose 中最简单的动画 API，用于对单个值进行动画处理。\n您只需提供目标值（或最终值），API 就会开始从当前值到指定值的动画。",
-                            style = MaterialTheme.typography.titleMedium
-                        )
-                    }
-                }
                 item("2") {
                     Block2()
                 }
@@ -140,10 +137,14 @@ object ValueBasePage {
                 }
                 item("5") {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(
-                            "📚 AnimationSpec(the specification of an animation)，动画规格",
-                            style = MaterialTheme.typography.titleMedium
-                        )
+                        Card {
+                            Text(
+                                "📚 AnimationSpec(the specification of an animation)，动画规格",
+                                style = MaterialTheme.typography.titleMedium,
+                                modifier = Modifier.padding(10.dp)
+                            )
+                        }
+
                         Text(
                             "动画规格（Spec）影响了动画在往目标值移动的过程中的具体运行逻辑，不同的Spec可以让动画产生不同的效果，下面通过实际案例看看他们的差异"
                         )
@@ -206,14 +207,21 @@ object ValueBasePage {
                             Text("点我开始动画")
                         }
                         Box(Modifier.height(10.dp))
-                        Text(
-                            "💡 1、tween",
-                            style = MaterialTheme.typography.titleMedium,
-                            modifier = Modifier.align(Alignment.Start)
-                        )
-                        Text(
-                            "       tween必须在规定的时间内完成，它的动画效果是基于时间参数计算的，可以使用 Easing 来指定不同的时间曲线动画效果。可以使用 tween() 方法进行创建。"
-                        )
+                        Card {
+                            Column(Modifier.padding(10.dp)) {
+
+                                Text(
+                                    "🚀 1、tween",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    modifier = Modifier.align(Alignment.Start)
+                                )
+                                Text(
+                                    "       tween必须在规定的时间内完成，它的动画效果是基于时间参数计算的，可以使用 Easing 来指定不同的时间曲线动画效果。可以使用 tween() 方法进行创建。"
+                                )
+                            }
+                        }
+
+                        Spacer(Modifier.height(20.dp))
                         Image(
                             painter = painterResource(id = R.drawable.valuebase_3_2),
                             contentDescription = null,
@@ -227,10 +235,131 @@ object ValueBasePage {
                                 
                                 💡「delayMillis」表示动画延迟时间。
                                 
-                                💡「easing」 动画曲线变化。
+                                💡「easing」 动画曲线变化，默认值是FastOutSlowIn（先快后慢）。
+                                
                             """.trimIndent(),
                             modifier = Modifier.align(Alignment.Start)
                         )
+                        Text("tween的参数中，值得一提的是easing参数，这是补间动画的核心，它决定了补间动画的时间与运行速率的关系，下面从代码上解释：")
+                        Image(
+                            painter = painterResource(id = R.drawable.valuebase_3_4),
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxWidth(),
+                            contentScale = ContentScale.FillWidth
+                        )
+                        Text(
+                            "Easing是一个接口，它的意图是绑定动画的百分比与动画的速率的关系，如何直接返回fraction，则表示动画是线性的匀速运动。",
+                            modifier = Modifier.padding(vertical = 10.dp)
+                        )
+                        Image(
+                            painter = painterResource(id = R.drawable.valuebase_3_3),
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxWidth(),
+                            contentScale = ContentScale.FillWidth
+                        )
+                        Text(
+                            "Compose已经默认提供了几种默认的Easing，它们分别是FastOutSlowInEasing（快进慢出），LinearOutSlowInEasing（匀速进慢出），FastOutLinearInEasing（快进匀速出），LinearEasing（匀速）",
+                            modifier = Modifier
+                                .padding(vertical = 10.dp)
+                                .align(Alignment.Start),
+                        )
+
+                        Card {
+                            Column(Modifier.padding(10.dp)) {
+                                Text(
+                                    "⚠️额外知识：以上几种Easing的均使用了贝塞尔曲线，关于贝塞尔曲线的知识读者可以自行学习。",
+                                )
+                                val context = LocalContext.current
+                                Button(
+                                    onClick = {
+                                        context.startActivity(
+                                            Intent(
+                                                Intent.ACTION_VIEW,
+                                                Uri.parse("https://cubic-bezier.com/")
+                                            )
+                                        )
+                                    },
+                                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                                ) {
+                                    Text("我想体验贝塞尔曲线")
+                                }
+                            }
+                        }
+
+
+                        Text(
+                            "另外，开发者还可以通过传入Path的方式构建Easing，或者直接根据数学函数构建Easing（直接实现Easing接口），不过这种开发模式比较少。",
+                            modifier = Modifier.padding(vertical = 10.dp)
+                        )
+                        Image(
+                            painter = painterResource(id = R.drawable.valuebase_3_5),
+                            contentScale = ContentScale.FillWidth,
+                            modifier = Modifier.fillMaxWidth(),
+                            contentDescription = null
+                        )
+
+                        Card(Modifier.padding(vertical = 20.dp)) {
+                            Text(
+                                "✈️如何合理根据场景使用不同的Easing呢？首先，大多数情况下是不会使用线性动画，因为自然中线性的东西会有很强烈的人造感，为了提升用户体验，往往使用的是快进慢出这种动画，或者使用弹性动画（下文会讲），因为这种动画可以模拟事物逐渐减速的感觉。",
+                                modifier = Modifier.padding(10.dp)
+                            )
+                        }
+
+                        Column(
+                            Modifier
+                                .align(Alignment.Start)
+                                .fillMaxWidth()
+                        ) {
+                            Text("快进慢出——FastOutSlowIn")
+                            Text(
+                                "模拟物体被抛进来，最后慢慢停下来的感觉",
+                                style = MaterialTheme.typography.bodySmall
+                            )
+
+                            var fastOutSlowInTarget by remember {
+                                mutableStateOf(false)
+                            }
+
+                            FastOutSlowInExample(
+                                modifier = Modifier
+                                    .align(Alignment.CenterHorizontally)
+                                    .padding(top = 40.dp, bottom = 20.dp), toTarget = fastOutSlowInTarget
+                            )
+
+                            Button(
+                                onClick = { fastOutSlowInTarget = !fastOutSlowInTarget },
+                                modifier = Modifier.align(Alignment.CenterHorizontally)
+                            ) {
+                                Text("点我开始")
+                            }
+
+                            HorizontalDivider(Modifier.padding(vertical = 20.dp))
+
+                            Text("匀速——Linear")
+                            Text(
+                                "全程匀速，比较缺乏生气",
+                                style = MaterialTheme.typography.bodySmall
+                            )
+
+                            var linearTarget by remember {
+                                mutableStateOf(false)
+                            }
+
+                            LinearTweenExample(
+                                modifier = Modifier
+                                    .align(Alignment.CenterHorizontally)
+                                    .padding(top = 40.dp, bottom = 20.dp), toTarget = linearTarget
+                            )
+
+                            Button(
+                                onClick = { linearTarget = !linearTarget },
+                                modifier = Modifier.align(Alignment.CenterHorizontally)
+                            ) {
+                                Text("点我开始")
+                            }
+
+                        }
+
                     }
                 }
             }
@@ -241,10 +370,15 @@ object ValueBasePage {
     @Composable
     private fun Block3_1() {
         Column {
-            Text(
-                "📚 下面从animateDpAsState()了解如何使用如何使用animate*AsState()",
-                style = MaterialTheme.typography.titleMedium
-            )
+            Card {
+                Text(
+                    "📚 下面从animateDpAsState()了解如何使用如何使用animate*AsState()",
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(10.dp)
+                )
+            }
+            Spacer(Modifier.height(10.dp))
+
             Image(
                 painter = painterResource(id = R.drawable.valuebase_3_1),
                 contentDescription = null,
@@ -269,6 +403,69 @@ object ValueBasePage {
 
     }
 
+    @Composable
+    private fun FastOutSlowInExample(
+        modifier: Modifier = Modifier,
+        toTarget: Boolean,
+    ) {
+        val offsetDp by animateDpAsState(
+            targetValue = if (toTarget) 150.dp else 0.dp, label = "",
+            animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing)
+        )
+        val alpha by animateFloatAsState(
+            targetValue = if (toTarget) 1f else 0f,
+            animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing), label = ""
+        )
+        Box(
+            modifier
+                .height(50.dp)
+                .width(200.dp)
+        ) {
+            Box(
+                Modifier
+                    .offset {
+                        IntOffset(offsetDp.roundToPx(), 0)
+                    }
+                    .graphicsLayer {
+                        this.alpha = alpha
+                    }
+                    .size(50.dp)
+                    .background(Color.Red.copy(0.2f))
+            )
+        }
+    }
+
+    @Composable
+    private fun LinearTweenExample(
+        modifier: Modifier = Modifier,
+        toTarget: Boolean,
+    ) {
+        val offsetDp by animateDpAsState(
+            targetValue = if (toTarget) 150.dp else 0.dp, label = "",
+            animationSpec = tween(durationMillis = 500, easing = LinearEasing)
+        )
+        val alpha by animateFloatAsState(
+            targetValue = if (toTarget) 1f else 0f,
+            animationSpec = tween(durationMillis = 500, easing = LinearEasing), label = ""
+        )
+        Box(
+            modifier
+                .height(50.dp)
+                .width(200.dp)
+        ) {
+            Box(
+                Modifier
+                    .offset {
+                        IntOffset(offsetDp.roundToPx(), 0)
+                    }
+                    .graphicsLayer {
+                        this.alpha = alpha
+                    }
+                    .size(50.dp)
+                    .background(Color.Red.copy(0.2f))
+            )
+        }
+    }
 
     @Composable
     private fun AnimateDpExampleRow(
@@ -300,27 +497,26 @@ object ValueBasePage {
     @Composable
     private fun Block4() {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(
-                "📚 animate*AsState的秘密：与MutableState Api类似的设计，我们对比一下两者",
-                style = MaterialTheme.typography.titleMedium,
-
-                )
-            Card(Modifier.padding(10.dp)) {
+            Card {
                 Text(
-                    "var value by remember { mutableStateOf(默认值) }",
-                    modifier = Modifier
-                        .padding(10.dp)
-                        .horizontalScroll(
-                            rememberScrollState()
-                        )
-                )
-            }
-            Card(Modifier.padding(10.dp)) {
-                Text(
-                    "val value by animate*AsState(最新值)",
+                    "📚 animate*AsState的秘密：与MutableState Api类似的设计，我们对比一下两者",
+                    style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(10.dp)
                 )
             }
+
+            Text(
+                "var value by remember { mutableStateOf(默认值) }",
+                modifier = Modifier
+                    .padding(vertical = 10.dp)
+                    .horizontalScroll(
+                        rememberScrollState()
+                    )
+            )
+            Text(
+                "val value by animate*AsState(最新值)",
+                modifier = Modifier.padding(10.dp)
+            )
             Text(
                 "可以看出，两者是非常类似的，也就是说再对组件的动画改造过程中，开发者只需要修改上流的实现即可（只需要修改value的实现），而在下流的组件取值的时候，并不需要做「任何改动」，这极大提高了开发速度。"
             )
@@ -364,16 +560,21 @@ object ValueBasePage {
     @Composable
     private fun Block3() {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(
-                "📚 animate*AsState 函数的使用方式非常简单，只需要遵循下面的范式即可：",
-                style = MaterialTheme.typography.titleMedium
-            )
-            Card(Modifier.padding(10.dp)) {
-                Text(
-                    "val value by animate*AsState(最新值)",
-                    modifier = Modifier.padding(10.dp)
-                )
+            Card {
+                Column(Modifier.padding(10.dp)) {
+                    Text(
+                        "📚 animate*AsState 函数的使用方式非常简单，只需要遵循下面的范式即可：",
+                        style = MaterialTheme.typography.titleMedium,
+                    )
+                    Text(
+                        "val value by animate*AsState(最新值)",
+                        modifier = Modifier.padding(10.dp)
+                    )
+                }
+
             }
+
+            Spacer(Modifier.height(20.dp))
             Text("按照业务的要求，填入不同的状态值，animate*AsState就会按照动画的要求，输出最新的value，直到value达到最新值")
             Box(Modifier.height(10.dp))
 
@@ -416,6 +617,14 @@ object ValueBasePage {
             label = ""
         )
         Column {
+            Card {
+                Text(
+                    "📚 animate*AsState函数是 Compose 中最简单的动画 API，用于对单个值进行动画处理。\n您只需提供目标值（或最终值），API 就会开始从当前值到指定值的动画。",
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(10.dp)
+                )
+            }
+            Spacer(Modifier.height(20.dp))
             Text("下面展示的是支持不同类型的animate*AsState的方法，其中*就是对应的类型")
             Box(
                 Modifier
