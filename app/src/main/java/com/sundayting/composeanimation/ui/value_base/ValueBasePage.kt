@@ -323,7 +323,8 @@ object ValueBasePage {
                             FastOutSlowInExample(
                                 modifier = Modifier
                                     .align(Alignment.CenterHorizontally)
-                                    .padding(top = 40.dp, bottom = 20.dp), toTarget = fastOutSlowInTarget
+                                    .padding(top = 40.dp, bottom = 20.dp),
+                                toTarget = fastOutSlowInTarget
                             )
 
                             Button(
@@ -358,6 +359,70 @@ object ValueBasePage {
                                 Text("点我开始")
                             }
 
+                        }
+
+                        Card(Modifier.padding(vertical = 20.dp)) {
+                            Column(Modifier.padding(10.dp)) {
+
+                                Text(
+                                    "🚀 2、keyframe",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    modifier = Modifier.align(Alignment.Start)
+                                )
+                                Text(
+                                    "       基于时间的动画规格，在不同的时间戳定义值，更精细地来实现关键帧的动画。可以使用 keyframes() 方法来创建 KeyframesSpec。"
+                                )
+
+                            }
+                        }
+
+                        Text("当业务上需要：某个时间段内以某种动画规格，某个时间段内使用另外某种动画规格时，比较适合使用关键帧动画——keyframe。\n下面以一个前期匀速，中期加速再减速，后期匀速的动画来演示：")
+
+                        var keyFrameTarget by remember {
+                            mutableStateOf(false)
+                        }
+
+                        KeyFrameExample(
+                            modifier = Modifier
+                                .align(Alignment.CenterHorizontally)
+                                .padding(top = 40.dp, bottom = 20.dp),
+                            toTarget = keyFrameTarget
+                        )
+
+                        Button(
+                            onClick = { keyFrameTarget = !keyFrameTarget },
+                            modifier = Modifier.align(Alignment.CenterHorizontally)
+                        ) {
+                            Text("点我开始")
+                        }
+
+                        Spacer(Modifier.height(20.dp))
+
+                        Column(
+                            Modifier.align(Alignment.Start),
+                            verticalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
+                            Text("keyframe的设置稍微绕一点，让我们看一看上面动画的keyframe是如何设置的")
+                            Image(
+                                painter = painterResource(id = R.drawable.valuebase_3_6),
+                                contentDescription = null,
+                                contentScale = ContentScale.FillWidth,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                            Text("首先通过durationMills设置整个动画的运行时间，然后通过「at」和「using」两个中缀表达式来分别设置时间区间和区间对应的Easing。\n\n然而令人困惑的是，at后面接着的是一个时间点，并不是时间段，那么at 0指的是哪个时间段呢，实际上在keyframe的设置中，at 0指的是「设置的时间段是0到下一个时间段」这个时间段，因此上述代码指的是0-1000这个时间段。\n\n因此，上述的代码中，0-1秒的时间段设置了线性，1-2秒的时间段设置了快进慢出，2-3秒的时间段设置了线性。")
+
+                            Card {
+                                Text(
+                                    "⚠️与tween不同的是，由于keyframe的设置过程中，时间段和运行的目标是绑定的，因此不能很好支持动画的逆向，如果想支持运行过程逆向的keyframe动画，只能反着写一段，参考下面的代码：",
+                                    modifier = Modifier.padding(10.dp)
+                                )
+                            }
+                            Image(
+                                painter = painterResource(id = R.drawable.valuebase_3_7),
+                                contentDescription = null,
+                                contentScale = ContentScale.FillWidth,
+                                modifier = Modifier.fillMaxWidth()
+                            )
                         }
 
                     }
@@ -465,6 +530,47 @@ object ValueBasePage {
                     .background(Color.Red.copy(0.2f))
             )
         }
+    }
+
+    @Composable
+    private fun KeyFrameExample(
+        modifier: Modifier = Modifier,
+        toTarget: Boolean,
+    ) {
+
+        val offsetDp by animateDpAsState(
+            targetValue = if (toTarget) 150.dp else 0.dp, label = "",
+            animationSpec = if (toTarget) {
+                keyframes {
+                    durationMillis = 3000
+                    0.dp at 0 using LinearEasing
+                    50.dp at 1000 using FastOutSlowInEasing
+                    100.dp at 2000 using LinearEasing
+                }
+            } else {
+                keyframes {
+                    durationMillis = 3000
+                    150.dp at 0 using LinearEasing
+                    100.dp at 1000 using FastOutSlowInEasing
+                    50.dp at 2000 using LinearEasing
+                }
+            }
+        )
+        Box(
+            modifier
+                .height(50.dp)
+                .width(200.dp)
+        ) {
+            Box(
+                Modifier
+                    .offset {
+                        IntOffset(offsetDp.roundToPx(), 0)
+                    }
+                    .size(50.dp)
+                    .background(Color.Red.copy(0.2f))
+            )
+        }
+
     }
 
     @Composable
