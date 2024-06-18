@@ -4,7 +4,11 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -17,30 +21,49 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            val navHostController = rememberNavController()
-            NavHost(
-                modifier = Modifier.fillMaxSize(),
-                navController = navHostController,
-                startDestination = MainPage.ROUTE
-            ) {
 
-                composable(
-                    MainPage.ROUTE
+            MaterialTheme{
+                val navHostController = rememberNavController()
+                CompositionLocalProvider(
+                    LocalTextStyle provides MaterialTheme.typography.bodyLarge
                 ) {
-                    MainPage.Screen(
-                        navHostController = navHostController
-                    )
+                    NavHost(
+                        modifier = Modifier.fillMaxSize(),
+                        navController = navHostController,
+                        startDestination = MainPage.ROUTE,
+                        enterTransition = {
+                            slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Left)
+                        },
+                        exitTransition = {
+                            slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Left)
+                        },
+                        popEnterTransition = {
+                            slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Right)
+                        },
+                        popExitTransition = {
+                            slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Right)
+                        }
+                    ) {
+
+                        composable(
+                            MainPage.ROUTE
+                        ) {
+                            MainPage.Screen(
+                                navHostController = navHostController
+                            )
+                        }
+
+                        composable(
+                            ValueBasePage.ROUTE
+                        ) {
+                            ValueBasePage.Screen(
+                                navHostController = navHostController
+                            )
+                        }
+                    }
                 }
 
-                composable(
-                    ValueBasePage.ROUTE
-                ) {
-                    ValueBasePage.Screen(
-                        navHostController = navHostController
-                    )
-                }
             }
-
         }
     }
 }

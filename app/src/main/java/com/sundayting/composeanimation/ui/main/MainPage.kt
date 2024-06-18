@@ -12,6 +12,8 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,6 +33,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.sharp.KeyboardArrowDown
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
@@ -66,6 +69,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.sundayting.composeanimation.R
+import com.sundayting.composeanimation.ui.value_base.ValueBasePage
 
 object MainPage {
 
@@ -318,7 +322,9 @@ object MainPage {
                     Text("动画目录分类：", style = MaterialTheme.typography.titleLarge)
                 }
                 item(key = "Value-based动画") {
-                    CategoriesItem(title = { Text("Value-based动画") }, onClick = {})
+                    CategoriesItem(title = { Text("Value-based动画") }, onClick = {
+                        navHostController.navigate(ValueBasePage.ROUTE)
+                    })
                 }
                 item(key = "定制型动画Animatable") {
                     CategoriesItem(title = { Text("定制型动画Animatable") }, onClick = {})
@@ -343,6 +349,12 @@ private fun CategoriesItem(
     Card(
         modifier
             .fillMaxWidth()
+            .clickable(
+                interactionSource = remember {
+                    MutableInteractionSource()
+                },
+                indication = rememberRipple()
+            ) { onClick() }
     ) {
         val imageTransition = rememberInfiniteTransition(label = "")
         val imageRotate by imageTransition.animateFloat(
