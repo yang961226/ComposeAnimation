@@ -205,7 +205,7 @@ object ValueBasePage {
                                     stiffness = Spring.StiffnessLow
                                 )
                             )
-                            Text("snap（快照动画）")
+                            Text("snap（跳切动画）")
                             AnimateDpExampleRow(
                                 toTarget = toTarget,
                                 animationSpec = snap()
@@ -598,6 +598,86 @@ object ValueBasePage {
                         Button(onClick = { springToTarget = !springToTarget }) {
                             Text("点我拉伸弹簧")
                         }
+                    }
+                }
+                item("9") {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Card(Modifier.padding(vertical = 20.dp)) {
+                            Column(Modifier.padding(10.dp)) {
+
+                                Text(
+                                    "🚀 3、其他动画规范",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    modifier = Modifier.align(Alignment.Start)
+                                )
+                                Text(
+                                    "       Compose还提供了一些有用的动画规范，例如SnapSpec，用于瞬时完成的动画、InfiniteRepeatableSpec，用于无限循环动画，读者可以自行动手试试。"
+                                )
+                            }
+                        }
+
+                    }
+                }
+                item {
+                    HorizontalDivider()
+                }
+                item("10") {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Card(Modifier.padding(vertical = 20.dp)) {
+                            Column(Modifier.padding(10.dp)) {
+
+                                Text(
+                                    "📚 额外知识点：TwoWayConverter",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    modifier = Modifier.align(Alignment.Start)
+                                )
+                                Text(
+                                    "       由于animate*AsState()的底层是基于animateValueAsState()，而animateValueAsState()是一个泛型方法，为了适配不同类型的animate*AsState()，因此需要一个转换器，将不同类型转换成统一的Float类型"
+                                )
+                            }
+                        }
+
+                        Spacer(Modifier.height(20.dp))
+                        Image(
+                            painterResource(id = R.drawable.twoway_1),
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxWidth(),
+                            contentScale = ContentScale.FillWidth
+                        )
+
+                        Spacer(Modifier.height(20.dp))
+
+                        Image(
+                            painterResource(id = R.drawable.twoway_2),
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxWidth(),
+                            contentScale = ContentScale.FillWidth
+                        )
+
+                        Text("可以看出，它可以需要实现将任意 T 类型的数值转换成标准的 AnimationVector 类型。以及将标准的 AnimationVector 类型转换为任意的 T 类型数值，让我们看看compose的几种默认实现：")
+
+                        Spacer(Modifier.height(20.dp))
+
+                        Image(
+                            painterResource(id = R.drawable.twoway_3),
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxWidth(),
+                            contentScale = ContentScale.FillWidth
+                        )
+
+                        Spacer(Modifier.height(20.dp))
+
+                        Image(
+                            painterResource(id = R.drawable.twoway_4),
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxWidth(),
+                            contentScale = ContentScale.FillWidth
+                        )
+
+                        Spacer(Modifier.height(20.dp))
+
+                        Text("因此，理论上开发者可以自定义TwoWayConverter来适配不同的类型，然而官方基本把常用的能用于动画的类型都适配了，例如常见的：Int,Float,Dp,Color,Size等，开发者直接使用即可，某种极端情况下开发者也可以自行适配。")
+
                     }
                 }
             }
