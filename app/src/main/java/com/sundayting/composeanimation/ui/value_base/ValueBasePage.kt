@@ -17,6 +17,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.animateSizeAsState
 import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.snap
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
@@ -39,6 +40,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -49,12 +51,14 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -193,13 +197,18 @@ object ValueBasePage {
                                     }
                                 }
                             )
-                            Text("弹簧动画")
+                            Text("spring（弹簧动画）")
                             AnimateDpExampleRow(
                                 toTarget = toTarget,
                                 animationSpec = spring(
                                     dampingRatio = Spring.DampingRatioMediumBouncy,
                                     stiffness = Spring.StiffnessLow
                                 )
+                            )
+                            Text("snap（快照动画）")
+                            AnimateDpExampleRow(
+                                toTarget = toTarget,
+                                animationSpec = snap()
                             )
                         }
 
@@ -208,8 +217,8 @@ object ValueBasePage {
                         }
                     }
                 }
-                item("6"){
-                    Column{
+                item("6") {
+                    Column {
                         Card {
                             Column(Modifier.padding(10.dp)) {
 
@@ -365,8 +374,8 @@ object ValueBasePage {
                         }
                     }
                 }
-                item("7"){
-                    Column(horizontalAlignment = Alignment.CenterHorizontally){
+                item("7") {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Card(Modifier.padding(vertical = 20.dp)) {
                             Column(Modifier.padding(10.dp)) {
 
@@ -429,8 +438,197 @@ object ValueBasePage {
                         )
                     }
                 }
+                item("8") {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Card(Modifier.padding(vertical = 20.dp)) {
+                            Column(Modifier.padding(10.dp)) {
+
+                                Text(
+                                    "🚀 3、spring",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    modifier = Modifier.align(Alignment.Start)
+                                )
+                                Text(
+                                    "       基于物理、模拟弹簧性质的动画规格，可以模拟不同阻尼比和刚度的弹簧动画。使用 spring() 方法来创建。"
+                                )
+                            }
+                        }
+
+                        Image(
+                            painter = painterResource(id = R.drawable.spring_1),
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxWidth(),
+                            contentScale = ContentScale.FillWidth
+                        )
+
+
+                        Text(
+                            """
+                                
+                                💡「dampingRatio」弹簧的阻尼比，阻尼比可以定义震动从一次弹跳到下一次弹跳所衰减的速度有多快。当阻尼比 < 1 时，阻尼比越小，弹簧越有弹性。
+                                
+                                💡「stiffness」弹簧的刚度，刚度越大，弹簧到静止的速度就越快。
+                                
+                                💡「visibilityThreshold」可见性阈值。达到阈值的时候，动画自动停止（弹簧动画在很小范围内运动的时候，几乎看不出运动，提前停下有利于减少手机能耗）。
+                                
+                            """.trimIndent(),
+                            modifier = Modifier.align(Alignment.Start)
+                        )
+
+                        Text("换句话来说，阻尼比决定的是「弹簧动画达到目标值之后，在目标值周围来回弹的范围大小」，刚度决定的是「弹簧动画有多块达到目标值」，")
+                        var springToTarget by remember {
+                            mutableStateOf(false)
+                        }
+
+                        var dampingRatioType by remember {
+                            mutableIntStateOf(0)
+                        }
+
+                        var stiffnessType by remember {
+                            mutableIntStateOf(0)
+                        }
+
+                        Row(
+                            Modifier
+                                .selectableGroup()
+                                .horizontalScroll(rememberScrollState()),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text("阻尼比：")
+                            RadioButton(
+                                selected = dampingRatioType == 0,
+                                onClick = { dampingRatioType = 0 },
+                            )
+                            Text("大")
+                            RadioButton(
+                                selected = dampingRatioType == 1,
+                                onClick = { dampingRatioType = 1 },
+                            )
+                            Text("中")
+                            RadioButton(
+                                selected = dampingRatioType == 2,
+                                onClick = { dampingRatioType = 2 },
+                            )
+                            Text("小")
+                            RadioButton(
+                                selected = dampingRatioType == 3,
+                                onClick = { dampingRatioType = 3 },
+                            )
+                            Text("无")
+                        }
+
+                        Row(
+                            Modifier
+                                .selectableGroup()
+                                .horizontalScroll(rememberScrollState()),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text("刚度：")
+                            RadioButton(
+                                selected = stiffnessType == 0,
+                                onClick = { stiffnessType = 0 },
+                            )
+                            Text("大")
+                            RadioButton(
+                                selected = stiffnessType == 1,
+                                onClick = { stiffnessType = 1 },
+                            )
+                            Text("中")
+                            RadioButton(
+                                selected = stiffnessType == 2,
+                                onClick = { stiffnessType = 2 },
+                            )
+                            Text("小")
+                            RadioButton(
+                                selected = stiffnessType == 3,
+                                onClick = { stiffnessType = 3 },
+                            )
+                            Text("超小")
+                        }
+
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(10.dp),
+                            modifier = Modifier.height(250.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+
+                            SpringAnimationExample(
+                                toTarget = springToTarget,
+                                dampingRatio = when (dampingRatioType) {
+                                    0 -> {
+                                        Spring.DampingRatioHighBouncy
+                                    }
+
+                                    1 -> {
+                                        Spring.DampingRatioMediumBouncy
+                                    }
+
+                                    2 -> {
+                                        Spring.DampingRatioLowBouncy
+                                    }
+
+                                    3 -> {
+                                        Spring.DampingRatioNoBouncy
+                                    }
+
+                                    else -> error("无")
+                                },
+                                stiffness = when (stiffnessType) {
+                                    0 -> {
+                                        Spring.StiffnessHigh
+                                    }
+
+                                    1 -> {
+                                        Spring.StiffnessMedium
+                                    }
+
+                                    2 -> {
+                                        Spring.StiffnessMediumLow
+                                    }
+
+                                    3 -> {
+                                        Spring.StiffnessLow
+                                    }
+
+                                    else -> error("无")
+                                }
+                            )
+                        }
+
+                        Button(onClick = { springToTarget = !springToTarget }) {
+                            Text("点我拉伸弹簧")
+                        }
+                    }
+                }
             }
         }
+
+    }
+
+    @Composable
+    private fun SpringAnimationExample(
+        modifier: Modifier = Modifier,
+        toTarget: Boolean,
+        dampingRatio: Float,
+        stiffness: Float,
+    ) {
+
+        val animateDp by animateDpAsState(
+            targetValue = if (toTarget) 200.dp else 100.dp,
+            label = "", animationSpec = spring(
+                dampingRatio = dampingRatio,
+                stiffness = stiffness
+            )
+        )
+
+        Image(
+            painter = painterResource(id = R.drawable.spring),
+            contentDescription = null,
+            modifier = modifier
+                .width(50.dp)
+                .height(animateDp),
+            contentScale = ContentScale.FillBounds
+        )
 
     }
 
