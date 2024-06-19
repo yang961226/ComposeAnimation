@@ -69,6 +69,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.sundayting.composeanimation.R
+import com.sundayting.composeanimation.ui.value_base.AnimatablePage
 import com.sundayting.composeanimation.ui.value_base.ValueBasePage
 
 object MainPage {
@@ -327,7 +328,9 @@ object MainPage {
                     })
                 }
                 item(key = "定制型动画Animatable") {
-                    CategoriesItem(title = { Text("定制型动画Animatable") }, onClick = {})
+                    CategoriesItem(title = { Text("定制型动画Animatable") }, onClick = {
+                        navHostController.navigate(AnimatablePage.ROUTE)
+                    })
                 }
                 item(key = "动画Modifier以及动画可组合项") {
                     CategoriesItem(title = { Text("动画Modifier、\n动画可组合项") }, onClick = {})

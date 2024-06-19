@@ -72,6 +72,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
@@ -140,549 +141,599 @@ object ValueBasePage {
                     HorizontalDivider()
                 }
                 item("5") {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Card {
-                            Text(
-                                "📚 AnimationSpec(the specification of an animation)，动画规格",
-                                style = MaterialTheme.typography.titleMedium,
-                                modifier = Modifier.padding(10.dp)
-                            )
-                        }
-
-                        Text(
-                            "动画规格（Spec）影响了动画在往目标值移动的过程中的具体运行逻辑，不同的Spec可以让动画产生不同的效果，下面通过实际案例看看他们的差异"
-                        )
-
-                        var toTarget by remember {
-                            mutableStateOf(false)
-                        }
-
-                        Column(
-                            modifier = Modifier.padding(vertical = 10.dp),
-                            verticalArrangement = Arrangement.spacedBy(10.dp)
-                        ) {
-                            Text("tween（补间动画——快进慢出）")
-                            AnimateDpExampleRow(
-                                toTarget = toTarget,
-                                animationSpec = tween(
-                                    durationMillis = 500
-                                )
-                            )
-                            Text("tween（补间动画——线性）")
-                            AnimateDpExampleRow(
-                                toTarget = toTarget,
-                                animationSpec = tween(
-                                    easing = LinearEasing,
-                                    durationMillis = 500
-                                )
-                            )
-                            Text("keyframe（关键帧动画）")
-                            AnimateDpExampleRow(
-                                toTarget = toTarget,
-                                animationSpec = if (toTarget) {
-                                    keyframes {
-                                        durationMillis = 500
-                                        0.dp at 0 using LinearOutSlowInEasing // for 0-15 ms
-                                        50.dp at 250 using FastOutLinearInEasing // for 15-75 ms
-                                        100.dp at 400 // ms
-                                        150.dp at 500 // ms
-                                    }
-                                } else {
-                                    keyframes {
-                                        durationMillis = 500
-                                        150.dp at 0 using LinearOutSlowInEasing // for 0-15 ms
-                                        100.dp at 250 using FastOutLinearInEasing // for 15-75 ms
-                                        50.dp at 400 // ms
-                                        0.dp at 500 // ms
-                                    }
-                                }
-                            )
-                            Text("spring（弹簧动画）")
-                            AnimateDpExampleRow(
-                                toTarget = toTarget,
-                                animationSpec = spring(
-                                    dampingRatio = Spring.DampingRatioMediumBouncy,
-                                    stiffness = Spring.StiffnessLow
-                                )
-                            )
-                            Text("snap（跳切动画）")
-                            AnimateDpExampleRow(
-                                toTarget = toTarget,
-                                animationSpec = snap()
-                            )
-                        }
-
-                        Button(onClick = { toTarget = !toTarget }) {
-                            Text("点我开始动画")
-                        }
-                    }
+                    Bloack5()
                 }
                 item("6") {
-                    Column {
-                        Card {
-                            Column(Modifier.padding(10.dp)) {
-
-                                Text(
-                                    "🚀 1、tween",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    modifier = Modifier.align(Alignment.Start)
-                                )
-                                Text(
-                                    "       tween必须在规定的时间内完成，它的动画效果是基于时间参数计算的，可以使用 Easing 来指定不同的时间曲线动画效果。可以使用 tween() 方法进行创建。"
-                                )
-                            }
-                        }
-
-                        Spacer(Modifier.height(20.dp))
-                        Image(
-                            painter = painterResource(id = R.drawable.valuebase_3_2),
-                            contentDescription = null,
-                            modifier = Modifier.fillMaxWidth(),
-                            contentScale = ContentScale.FillWidth
-                        )
-                        Text(
-                            """
-                                
-                                💡「durationMillis」表示动画的持续时间。
-                                
-                                💡「delayMillis」表示动画延迟时间。
-                                
-                                💡「easing」 动画曲线变化，默认值是FastOutSlowIn（先快后慢）。
-                                
-                            """.trimIndent(),
-                            modifier = Modifier.align(Alignment.Start)
-                        )
-                        Text("tween的参数中，值得一提的是easing参数，这是补间动画的核心，它决定了补间动画的时间与运行速率的关系，下面从代码上解释：")
-                        Image(
-                            painter = painterResource(id = R.drawable.valuebase_3_4),
-                            contentDescription = null,
-                            modifier = Modifier.fillMaxWidth(),
-                            contentScale = ContentScale.FillWidth
-                        )
-                        Text(
-                            "Easing是一个接口，它的意图是绑定动画的百分比与动画的速率的关系，如何直接返回fraction，则表示动画是线性的匀速运动。",
-                            modifier = Modifier.padding(vertical = 10.dp)
-                        )
-                        Image(
-                            painter = painterResource(id = R.drawable.valuebase_3_3),
-                            contentDescription = null,
-                            modifier = Modifier.fillMaxWidth(),
-                            contentScale = ContentScale.FillWidth
-                        )
-                        Text(
-                            "Compose已经默认提供了几种默认的Easing，它们分别是FastOutSlowInEasing（快进慢出），LinearOutSlowInEasing（匀速进慢出），FastOutLinearInEasing（快进匀速出），LinearEasing（匀速）",
-                            modifier = Modifier
-                                .padding(vertical = 10.dp)
-                                .align(Alignment.Start),
-                        )
-
-                        Card {
-                            Column(Modifier.padding(10.dp)) {
-                                Text(
-                                    "⚠️额外知识：以上几种Easing的均使用了贝塞尔曲线，关于贝塞尔曲线的知识读者可以自行学习。",
-                                )
-                                val context = LocalContext.current
-                                Button(
-                                    onClick = {
-                                        context.startActivity(
-                                            Intent(
-                                                Intent.ACTION_VIEW,
-                                                Uri.parse("https://cubic-bezier.com/")
-                                            )
-                                        )
-                                    },
-                                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                                ) {
-                                    Text("我想体验贝塞尔曲线")
-                                }
-                            }
-                        }
-
-
-                        Text(
-                            "另外，开发者还可以通过传入Path的方式构建Easing，或者直接根据数学函数构建Easing（直接实现Easing接口），不过这种开发模式比较少。",
-                            modifier = Modifier.padding(vertical = 10.dp)
-                        )
-                        Image(
-                            painter = painterResource(id = R.drawable.valuebase_3_5),
-                            contentScale = ContentScale.FillWidth,
-                            modifier = Modifier.fillMaxWidth(),
-                            contentDescription = null
-                        )
-
-                        Card(Modifier.padding(vertical = 20.dp)) {
-                            Text(
-                                "✈️如何合理根据场景使用不同的Easing呢？首先，大多数情况下是不会使用线性动画，因为自然中线性的东西会有很强烈的人造感，为了提升用户体验，往往使用的是快进慢出这种动画，或者使用弹性动画（下文会讲），因为这种动画可以模拟事物逐渐减速的感觉。",
-                                modifier = Modifier.padding(10.dp)
-                            )
-                        }
-
-                        Column(
-                            Modifier
-                                .align(Alignment.Start)
-                                .fillMaxWidth()
-                        ) {
-                            Text("快进慢出——FastOutSlowIn")
-                            Text(
-                                "模拟物体被抛进来，最后慢慢停下来的感觉",
-                                style = MaterialTheme.typography.bodySmall
-                            )
-
-                            var fastOutSlowInTarget by remember {
-                                mutableStateOf(false)
-                            }
-
-                            FastOutSlowInExample(
-                                modifier = Modifier
-                                    .align(Alignment.CenterHorizontally)
-                                    .padding(top = 40.dp, bottom = 20.dp),
-                                toTarget = fastOutSlowInTarget
-                            )
-
-                            Button(
-                                onClick = { fastOutSlowInTarget = !fastOutSlowInTarget },
-                                modifier = Modifier.align(Alignment.CenterHorizontally)
-                            ) {
-                                Text("点我开始")
-                            }
-
-                            HorizontalDivider(Modifier.padding(vertical = 20.dp))
-
-                            Text("匀速——Linear")
-                            Text(
-                                "全程匀速，比较缺乏生气",
-                                style = MaterialTheme.typography.bodySmall
-                            )
-
-                            var linearTarget by remember {
-                                mutableStateOf(false)
-                            }
-
-                            LinearTweenExample(
-                                modifier = Modifier
-                                    .align(Alignment.CenterHorizontally)
-                                    .padding(top = 40.dp, bottom = 20.dp), toTarget = linearTarget
-                            )
-
-                            Button(
-                                onClick = { linearTarget = !linearTarget },
-                                modifier = Modifier.align(Alignment.CenterHorizontally)
-                            ) {
-                                Text("点我开始")
-                            }
-
-                        }
-                    }
+                    Bloack6()
                 }
                 item("7") {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Card(Modifier.padding(vertical = 20.dp)) {
-                            Column(Modifier.padding(10.dp)) {
-
-                                Text(
-                                    "🚀 2、keyframe",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    modifier = Modifier.align(Alignment.Start)
-                                )
-                                Text(
-                                    "       基于时间的动画规格，在不同的时间戳定义值，更精细地来实现关键帧的动画。可以使用 keyframes() 方法来创建 KeyframesSpec。"
-                                )
-
-                            }
-                        }
-
-                        Text("当业务上需要：某个时间段内以某种动画规格，某个时间段内使用另外某种动画规格时，比较适合使用关键帧动画——keyframe。\n下面以一个前期匀速，中期加速再减速，后期匀速的动画来演示：")
-
-                        var keyFrameTarget by remember {
-                            mutableStateOf(false)
-                        }
-
-                        KeyFrameExample(
-                            modifier = Modifier
-                                .padding(top = 40.dp, bottom = 20.dp),
-                            toTarget = keyFrameTarget
-                        )
-
-                        Button(
-                            onClick = { keyFrameTarget = !keyFrameTarget },
-                        ) {
-                            Text("点我开始")
-                        }
-                    }
-
-                    Spacer(Modifier.height(20.dp))
-
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(10.dp)
-                    ) {
-                        Text("keyframe的设置稍微绕一点，让我们看一看上面动画的keyframe是如何设置的")
-                        Image(
-                            painter = painterResource(id = R.drawable.valuebase_3_6),
-                            contentDescription = null,
-                            contentScale = ContentScale.FillWidth,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                        Text("首先通过durationMills设置整个动画的运行时间，然后通过「at」和「using」两个中缀表达式来分别设置时间区间和区间对应的Easing。\n\n然而令人困惑的是，at后面接着的是一个时间点，并不是时间段，那么at 0指的是哪个时间段呢，实际上在keyframe的设置中，at 0指的是「设置的时间段是0到下一个时间段」这个时间段，因此上述代码指的是0-1000这个时间段。\n\n因此，上述的代码中，0-1秒的时间段设置了线性，1-2秒的时间段设置了快进慢出，2-3秒的时间段设置了线性。")
-
-                        Card {
-                            Text(
-                                "⚠️与tween不同的是，由于keyframe的设置过程中，时间段和运行的目标是绑定的，因此不能很好支持动画的逆向，如果想支持运行过程逆向的keyframe动画，只能反着写一段，参考下面的代码：",
-                                modifier = Modifier.padding(10.dp)
-                            )
-                        }
-                        Image(
-                            painter = painterResource(id = R.drawable.valuebase_3_7),
-                            contentDescription = null,
-                            contentScale = ContentScale.FillWidth,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
+                    Block7()
+                }
+                item{
+                    HorizontalDivider()
                 }
                 item("8") {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Card(Modifier.padding(vertical = 20.dp)) {
-                            Column(Modifier.padding(10.dp)) {
-
-                                Text(
-                                    "🚀 3、spring",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    modifier = Modifier.align(Alignment.Start)
-                                )
-                                Text(
-                                    "       基于物理、模拟弹簧性质的动画规格，可以模拟不同阻尼比和刚度的弹簧动画。使用 spring() 方法来创建。"
-                                )
-                            }
-                        }
-
-                        Image(
-                            painter = painterResource(id = R.drawable.spring_1),
-                            contentDescription = null,
-                            modifier = Modifier.fillMaxWidth(),
-                            contentScale = ContentScale.FillWidth
-                        )
-
-
-                        Text(
-                            """
-                                
-                                💡「dampingRatio」弹簧的阻尼比，阻尼比可以定义震动从一次弹跳到下一次弹跳所衰减的速度有多快。当阻尼比 < 1 时，阻尼比越小，弹簧越有弹性。
-                                
-                                💡「stiffness」弹簧的刚度，刚度越大，弹簧到静止的速度就越快。
-                                
-                                💡「visibilityThreshold」可见性阈值。达到阈值的时候，动画自动停止（弹簧动画在很小范围内运动的时候，几乎看不出运动，提前停下有利于减少手机能耗）。
-                                
-                            """.trimIndent(),
-                            modifier = Modifier.align(Alignment.Start)
-                        )
-
-                        Text("换句话来说，阻尼比决定的是「弹簧动画达到目标值之后，在目标值周围来回弹的范围大小」，刚度决定的是「弹簧动画有多块达到目标值」，")
-                        var springToTarget by remember {
-                            mutableStateOf(false)
-                        }
-
-                        var dampingRatioType by remember {
-                            mutableIntStateOf(0)
-                        }
-
-                        var stiffnessType by remember {
-                            mutableIntStateOf(0)
-                        }
-
-                        Row(
-                            Modifier
-                                .selectableGroup()
-                                .horizontalScroll(rememberScrollState()),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text("阻尼比：")
-                            RadioButton(
-                                selected = dampingRatioType == 0,
-                                onClick = { dampingRatioType = 0 },
-                            )
-                            Text("大")
-                            RadioButton(
-                                selected = dampingRatioType == 1,
-                                onClick = { dampingRatioType = 1 },
-                            )
-                            Text("中")
-                            RadioButton(
-                                selected = dampingRatioType == 2,
-                                onClick = { dampingRatioType = 2 },
-                            )
-                            Text("小")
-                            RadioButton(
-                                selected = dampingRatioType == 3,
-                                onClick = { dampingRatioType = 3 },
-                            )
-                            Text("无")
-                        }
-
-                        Row(
-                            Modifier
-                                .selectableGroup()
-                                .horizontalScroll(rememberScrollState()),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text("刚度：")
-                            RadioButton(
-                                selected = stiffnessType == 0,
-                                onClick = { stiffnessType = 0 },
-                            )
-                            Text("大")
-                            RadioButton(
-                                selected = stiffnessType == 1,
-                                onClick = { stiffnessType = 1 },
-                            )
-                            Text("中")
-                            RadioButton(
-                                selected = stiffnessType == 2,
-                                onClick = { stiffnessType = 2 },
-                            )
-                            Text("小")
-                            RadioButton(
-                                selected = stiffnessType == 3,
-                                onClick = { stiffnessType = 3 },
-                            )
-                            Text("超小")
-                        }
-
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(10.dp),
-                            modifier = Modifier.height(250.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-
-                            SpringAnimationExample(
-                                toTarget = springToTarget,
-                                dampingRatio = when (dampingRatioType) {
-                                    0 -> {
-                                        Spring.DampingRatioHighBouncy
-                                    }
-
-                                    1 -> {
-                                        Spring.DampingRatioMediumBouncy
-                                    }
-
-                                    2 -> {
-                                        Spring.DampingRatioLowBouncy
-                                    }
-
-                                    3 -> {
-                                        Spring.DampingRatioNoBouncy
-                                    }
-
-                                    else -> error("无")
-                                },
-                                stiffness = when (stiffnessType) {
-                                    0 -> {
-                                        Spring.StiffnessHigh
-                                    }
-
-                                    1 -> {
-                                        Spring.StiffnessMedium
-                                    }
-
-                                    2 -> {
-                                        Spring.StiffnessMediumLow
-                                    }
-
-                                    3 -> {
-                                        Spring.StiffnessLow
-                                    }
-
-                                    else -> error("无")
-                                }
-                            )
-                        }
-
-                        Button(onClick = { springToTarget = !springToTarget }) {
-                            Text("点我拉伸弹簧")
-                        }
-                    }
+                    Block8()
                 }
                 item("9") {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Card(Modifier.padding(vertical = 20.dp)) {
-                            Column(Modifier.padding(10.dp)) {
-
-                                Text(
-                                    "🚀 3、其他动画规范",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    modifier = Modifier.align(Alignment.Start)
-                                )
-                                Text(
-                                    "       Compose还提供了一些有用的动画规范，例如SnapSpec，用于瞬时完成的动画、InfiniteRepeatableSpec，用于无限循环动画，读者可以自行动手试试。"
-                                )
-                            }
-                        }
-
-                    }
+                    Block9()
                 }
                 item {
                     HorizontalDivider()
                 }
                 item("10") {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Card(Modifier.padding(vertical = 20.dp)) {
-                            Column(Modifier.padding(10.dp)) {
+                    Block10()
+                }
 
-                                Text(
-                                    "📚 额外知识点：TwoWayConverter",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    modifier = Modifier.align(Alignment.Start)
-                                )
-                                Text(
-                                    "       由于animate*AsState()的底层是基于animateValueAsState()，而animateValueAsState()是一个泛型方法，为了适配不同类型的animate*AsState()，因此需要一个转换器，将不同类型转换成统一的Float类型"
-                                )
+                item {
+                    HorizontalDivider()
+                }
+                item("11") {
+                    Card {
+                        Column(
+                            Modifier.padding(10.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text("🎉", style = TextStyle(fontSize = 50.sp))
+                            Text("恭喜你读者，你已经完成这一节的所有内容，请根据本章的代码案例自行练习，或者返回并阅读下一章的内容")
+                            Button(onClick = { navHostController.popBackStack() }) {
+                                Text("返回")
                             }
                         }
-
-                        Spacer(Modifier.height(20.dp))
-                        Image(
-                            painterResource(id = R.drawable.twoway_1),
-                            contentDescription = null,
-                            modifier = Modifier.fillMaxWidth(),
-                            contentScale = ContentScale.FillWidth
-                        )
-
-                        Spacer(Modifier.height(20.dp))
-
-                        Image(
-                            painterResource(id = R.drawable.twoway_2),
-                            contentDescription = null,
-                            modifier = Modifier.fillMaxWidth(),
-                            contentScale = ContentScale.FillWidth
-                        )
-
-                        Text("可以看出，它可以需要实现将任意 T 类型的数值转换成标准的 AnimationVector 类型。以及将标准的 AnimationVector 类型转换为任意的 T 类型数值，让我们看看compose的几种默认实现：")
-
-                        Spacer(Modifier.height(20.dp))
-
-                        Image(
-                            painterResource(id = R.drawable.twoway_3),
-                            contentDescription = null,
-                            modifier = Modifier.fillMaxWidth(),
-                            contentScale = ContentScale.FillWidth
-                        )
-
-                        Spacer(Modifier.height(20.dp))
-
-                        Image(
-                            painterResource(id = R.drawable.twoway_4),
-                            contentDescription = null,
-                            modifier = Modifier.fillMaxWidth(),
-                            contentScale = ContentScale.FillWidth
-                        )
-
-                        Spacer(Modifier.height(20.dp))
-
-                        Text("因此，理论上开发者可以自定义TwoWayConverter来适配不同的类型，然而官方基本把常用的能用于动画的类型都适配了，例如常见的：Int,Float,Dp,Color,Size等，开发者直接使用即可，某种极端情况下开发者也可以自行适配。")
-
                     }
                 }
             }
         }
 
+    }
+
+    @Composable
+    private fun Block10() {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Card(Modifier.padding(vertical = 20.dp)) {
+                Column(Modifier.padding(10.dp)) {
+
+                    Text(
+                        "📚 额外知识点：TwoWayConverter",
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.align(Alignment.Start)
+                    )
+                    Text(
+                        "       由于animate*AsState()的底层是基于animateValueAsState()，而animateValueAsState()是一个泛型方法，为了适配不同类型的animate*AsState()，因此需要一个转换器，将不同类型转换成统一的Float类型"
+                    )
+                }
+            }
+
+            Spacer(Modifier.height(20.dp))
+            Image(
+                painterResource(id = R.drawable.twoway_1),
+                contentDescription = null,
+                modifier = Modifier.fillMaxWidth(),
+                contentScale = ContentScale.FillWidth
+            )
+
+            Spacer(Modifier.height(20.dp))
+
+            Image(
+                painterResource(id = R.drawable.twoway_2),
+                contentDescription = null,
+                modifier = Modifier.fillMaxWidth(),
+                contentScale = ContentScale.FillWidth
+            )
+
+            Text("可以看出，它可以需要实现将任意 T 类型的数值转换成标准的 AnimationVector 类型。以及将标准的 AnimationVector 类型转换为任意的 T 类型数值，让我们看看compose的几种默认实现：")
+
+            Spacer(Modifier.height(20.dp))
+
+            Image(
+                painterResource(id = R.drawable.twoway_3),
+                contentDescription = null,
+                modifier = Modifier.fillMaxWidth(),
+                contentScale = ContentScale.FillWidth
+            )
+
+            Spacer(Modifier.height(20.dp))
+
+            Image(
+                painterResource(id = R.drawable.twoway_4),
+                contentDescription = null,
+                modifier = Modifier.fillMaxWidth(),
+                contentScale = ContentScale.FillWidth
+            )
+
+            Spacer(Modifier.height(20.dp))
+
+            Text("因此，理论上开发者可以自定义TwoWayConverter来适配不同的类型，然而官方基本把常用的能用于动画的类型都适配了，例如常见的：Int,Float,Dp,Color,Size等，开发者直接使用即可，某种极端情况下开发者也可以自行适配。")
+
+        }
+    }
+
+    @Composable
+    private fun Block9() {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Card(Modifier.padding(vertical = 20.dp)) {
+                Column(Modifier.padding(10.dp)) {
+
+                    Text(
+                        "🚀 3、其他动画规范",
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.align(Alignment.Start)
+                    )
+                    Text(
+                        "       Compose还提供了一些有用的动画规范，例如SnapSpec，用于瞬时完成的动画、InfiniteRepeatableSpec，用于无限循环动画，读者可以自行动手试试。"
+                    )
+                }
+            }
+
+        }
+    }
+
+    @Composable
+    private fun Block8() {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Card(Modifier.padding(vertical = 20.dp)) {
+                Column(Modifier.padding(10.dp)) {
+                    Text(
+                        "🚀 3、spring",
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.align(Alignment.Start)
+                    )
+                    Text(
+                        "       基于物理、模拟弹簧性质的动画规格，可以模拟不同阻尼比和刚度的弹簧动画。使用 spring() 方法来创建。"
+                    )
+                }
+            }
+
+            Image(
+                painter = painterResource(id = R.drawable.spring_1),
+                contentDescription = null,
+                modifier = Modifier.fillMaxWidth(),
+                contentScale = ContentScale.FillWidth
+            )
+
+
+            Text(
+                """
+                                    
+                                    💡「dampingRatio」弹簧的阻尼比，阻尼比可以定义震动从一次弹跳到下一次弹跳所衰减的速度有多快。当阻尼比 < 1 时，阻尼比越小，弹簧越有弹性。
+                                    
+                                    💡「stiffness」弹簧的刚度，刚度越大，弹簧到静止的速度就越快。
+                                    
+                                    💡「visibilityThreshold」可见性阈值。达到阈值的时候，动画自动停止（弹簧动画在很小范围内运动的时候，几乎看不出运动，提前停下有利于减少手机能耗）。
+                                    
+                                """.trimIndent(),
+                modifier = Modifier.align(Alignment.Start)
+            )
+
+            Text("换句话来说，阻尼比决定的是「弹簧动画达到目标值之后，在目标值周围来回弹的范围大小」，刚度决定的是「弹簧动画有多块达到目标值」，")
+            var springToTarget by remember {
+                mutableStateOf(false)
+            }
+
+            var dampingRatioType by remember {
+                mutableIntStateOf(0)
+            }
+
+            var stiffnessType by remember {
+                mutableIntStateOf(0)
+            }
+
+            Row(
+                Modifier
+                    .selectableGroup()
+                    .horizontalScroll(rememberScrollState()),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text("阻尼比：")
+                RadioButton(
+                    selected = dampingRatioType == 0,
+                    onClick = { dampingRatioType = 0 },
+                )
+                Text("大")
+                RadioButton(
+                    selected = dampingRatioType == 1,
+                    onClick = { dampingRatioType = 1 },
+                )
+                Text("中")
+                RadioButton(
+                    selected = dampingRatioType == 2,
+                    onClick = { dampingRatioType = 2 },
+                )
+                Text("小")
+                RadioButton(
+                    selected = dampingRatioType == 3,
+                    onClick = { dampingRatioType = 3 },
+                )
+                Text("无")
+            }
+
+            Row(
+                Modifier
+                    .selectableGroup()
+                    .horizontalScroll(rememberScrollState()),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text("刚度：")
+                RadioButton(
+                    selected = stiffnessType == 0,
+                    onClick = { stiffnessType = 0 },
+                )
+                Text("大")
+                RadioButton(
+                    selected = stiffnessType == 1,
+                    onClick = { stiffnessType = 1 },
+                )
+                Text("中")
+                RadioButton(
+                    selected = stiffnessType == 2,
+                    onClick = { stiffnessType = 2 },
+                )
+                Text("小")
+                RadioButton(
+                    selected = stiffnessType == 3,
+                    onClick = { stiffnessType = 3 },
+                )
+                Text("超小")
+            }
+
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                modifier = Modifier.height(250.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+
+                SpringAnimationExample(
+                    toTarget = springToTarget,
+                    dampingRatio = when (dampingRatioType) {
+                        0 -> {
+                            Spring.DampingRatioHighBouncy
+                        }
+
+                        1 -> {
+                            Spring.DampingRatioMediumBouncy
+                        }
+
+                        2 -> {
+                            Spring.DampingRatioLowBouncy
+                        }
+
+                        3 -> {
+                            Spring.DampingRatioNoBouncy
+                        }
+
+                        else -> error("无")
+                    },
+                    stiffness = when (stiffnessType) {
+                        0 -> {
+                            Spring.StiffnessHigh
+                        }
+
+                        1 -> {
+                            Spring.StiffnessMedium
+                        }
+
+                        2 -> {
+                            Spring.StiffnessMediumLow
+                        }
+
+                        3 -> {
+                            Spring.StiffnessLow
+                        }
+
+                        else -> error("无")
+                    }
+                )
+            }
+
+            Button(onClick = { springToTarget = !springToTarget }) {
+                Text("点我拉伸弹簧")
+            }
+        }
+    }
+
+    @Composable
+    private fun Block7() {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Card(Modifier.padding(vertical = 20.dp)) {
+                Column(Modifier.padding(10.dp)) {
+
+                    Text(
+                        "🚀 2、keyframe",
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.align(Alignment.Start)
+                    )
+                    Text(
+                        "       基于时间的动画规格，在不同的时间戳定义值，更精细地来实现关键帧的动画。可以使用 keyframes() 方法来创建 KeyframesSpec。"
+                    )
+
+                }
+            }
+
+            Text("当业务上需要：某个时间段内以某种动画规格，某个时间段内使用另外某种动画规格时，比较适合使用关键帧动画——keyframe。\n下面以一个前期匀速，中期加速再减速，后期匀速的动画来演示：")
+
+            var keyFrameTarget by remember {
+                mutableStateOf(false)
+            }
+
+            KeyFrameExample(
+                modifier = Modifier
+                    .padding(top = 40.dp, bottom = 20.dp),
+                toTarget = keyFrameTarget
+            )
+
+            Button(
+                onClick = { keyFrameTarget = !keyFrameTarget },
+            ) {
+                Text("点我开始")
+            }
+        }
+
+        Spacer(Modifier.height(20.dp))
+
+        Column(
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            Text("keyframe的设置稍微绕一点，让我们看一看上面动画的keyframe是如何设置的")
+            Image(
+                painter = painterResource(id = R.drawable.valuebase_3_6),
+                contentDescription = null,
+                contentScale = ContentScale.FillWidth,
+                modifier = Modifier.fillMaxWidth()
+            )
+            Text("首先通过durationMills设置整个动画的运行时间，然后通过「at」和「using」两个中缀表达式来分别设置时间区间和区间对应的Easing。\n\n然而令人困惑的是，at后面接着的是一个时间点，并不是时间段，那么at 0指的是哪个时间段呢，实际上在keyframe的设置中，at 0指的是「设置的时间段是0到下一个时间段」这个时间段，因此上述代码指的是0-1000这个时间段。\n\n因此，上述的代码中，0-1秒的时间段设置了线性，1-2秒的时间段设置了快进慢出，2-3秒的时间段设置了线性。")
+
+            Card {
+                Text(
+                    "⚠️与tween不同的是，由于keyframe的设置过程中，时间段和运行的目标是绑定的，因此不能很好支持动画的逆向，如果想支持运行过程逆向的keyframe动画，只能反着写一段，参考下面的代码：",
+                    modifier = Modifier.padding(10.dp)
+                )
+            }
+            Image(
+                painter = painterResource(id = R.drawable.valuebase_3_7),
+                contentDescription = null,
+                contentScale = ContentScale.FillWidth,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+    }
+
+    @Composable
+    private fun Bloack6() {
+        Column {
+            Card {
+                Column(Modifier.padding(10.dp)) {
+
+                    Text(
+                        "🚀 1、tween",
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.align(Alignment.Start)
+                    )
+                    Text(
+                        "       tween必须在规定的时间内完成，它的动画效果是基于时间参数计算的，可以使用 Easing 来指定不同的时间曲线动画效果。可以使用 tween() 方法进行创建。"
+                    )
+                }
+            }
+
+            Spacer(Modifier.height(20.dp))
+            Image(
+                painter = painterResource(id = R.drawable.valuebase_3_2),
+                contentDescription = null,
+                modifier = Modifier.fillMaxWidth(),
+                contentScale = ContentScale.FillWidth
+            )
+            Text(
+                """
+                                    
+                                    💡「durationMillis」表示动画的持续时间。
+                                    
+                                    💡「delayMillis」表示动画延迟时间。
+                                    
+                                    💡「easing」 动画曲线变化，默认值是FastOutSlowIn（先快后慢）。
+                                    
+                                """.trimIndent(),
+                modifier = Modifier.align(Alignment.Start)
+            )
+            Text("tween的参数中，值得一提的是easing参数，这是补间动画的核心，它决定了补间动画的时间与运行速率的关系，下面从代码上解释：")
+            Image(
+                painter = painterResource(id = R.drawable.valuebase_3_4),
+                contentDescription = null,
+                modifier = Modifier.fillMaxWidth(),
+                contentScale = ContentScale.FillWidth
+            )
+            Text(
+                "Easing是一个接口，它的意图是绑定动画的百分比与动画的速率的关系，如何直接返回fraction，则表示动画是线性的匀速运动。",
+                modifier = Modifier.padding(vertical = 10.dp)
+            )
+            Image(
+                painter = painterResource(id = R.drawable.valuebase_3_3),
+                contentDescription = null,
+                modifier = Modifier.fillMaxWidth(),
+                contentScale = ContentScale.FillWidth
+            )
+            Text(
+                "Compose已经默认提供了几种默认的Easing，它们分别是FastOutSlowInEasing（快进慢出），LinearOutSlowInEasing（匀速进慢出），FastOutLinearInEasing（快进匀速出），LinearEasing（匀速）",
+                modifier = Modifier
+                    .padding(vertical = 10.dp)
+                    .align(Alignment.Start),
+            )
+
+            Card {
+                Column(Modifier.padding(10.dp)) {
+                    Text(
+                        "⚠️额外知识：以上几种Easing的均使用了贝塞尔曲线，关于贝塞尔曲线的知识读者可以自行学习。",
+                    )
+                    val context = LocalContext.current
+                    Button(
+                        onClick = {
+                            context.startActivity(
+                                Intent(
+                                    Intent.ACTION_VIEW,
+                                    Uri.parse("https://cubic-bezier.com/")
+                                )
+                            )
+                        },
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    ) {
+                        Text("我想体验贝塞尔曲线")
+                    }
+                }
+            }
+
+
+            Text(
+                "另外，开发者还可以通过传入Path的方式构建Easing，或者直接根据数学函数构建Easing（直接实现Easing接口），不过这种开发模式比较少。",
+                modifier = Modifier.padding(vertical = 10.dp)
+            )
+            Image(
+                painter = painterResource(id = R.drawable.valuebase_3_5),
+                contentScale = ContentScale.FillWidth,
+                modifier = Modifier.fillMaxWidth(),
+                contentDescription = null
+            )
+
+            Card(Modifier.padding(vertical = 20.dp)) {
+                Text(
+                    "✈️如何合理根据场景使用不同的Easing呢？首先，大多数情况下是不会使用线性动画，因为自然中线性的东西会有很强烈的人造感，为了提升用户体验，往往使用的是快进慢出这种动画，或者使用弹性动画（下文会讲），因为这种动画可以模拟事物逐渐减速的感觉。",
+                    modifier = Modifier.padding(10.dp)
+                )
+            }
+
+            Column(
+                Modifier
+                    .align(Alignment.Start)
+                    .fillMaxWidth()
+            ) {
+                Text("快进慢出——FastOutSlowIn")
+                Text(
+                    "模拟物体被抛进来，最后慢慢停下来的感觉",
+                    style = MaterialTheme.typography.bodySmall
+                )
+
+                var fastOutSlowInTarget by remember {
+                    mutableStateOf(false)
+                }
+
+                FastOutSlowInExample(
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(top = 40.dp, bottom = 20.dp),
+                    toTarget = fastOutSlowInTarget
+                )
+
+                Button(
+                    onClick = { fastOutSlowInTarget = !fastOutSlowInTarget },
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                ) {
+                    Text("点我开始")
+                }
+
+                HorizontalDivider(Modifier.padding(vertical = 20.dp))
+
+                Text("匀速——Linear")
+                Text(
+                    "全程匀速，比较缺乏生气",
+                    style = MaterialTheme.typography.bodySmall
+                )
+
+                var linearTarget by remember {
+                    mutableStateOf(false)
+                }
+
+                LinearTweenExample(
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(top = 40.dp, bottom = 20.dp), toTarget = linearTarget
+                )
+
+                Button(
+                    onClick = { linearTarget = !linearTarget },
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                ) {
+                    Text("点我开始")
+                }
+
+            }
+        }
+    }
+
+    @Composable
+    private fun Bloack5() {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Card {
+                Text(
+                    "📚 AnimationSpec(the specification of an animation)，动画规格",
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(10.dp)
+                )
+            }
+
+            Text(
+                "动画规格（Spec）影响了动画在往目标值移动的过程中的具体运行逻辑，不同的Spec可以让动画产生不同的效果，下面通过实际案例看看他们的差异"
+            )
+
+            var toTarget by remember {
+                mutableStateOf(false)
+            }
+
+            Column(
+                modifier = Modifier.padding(vertical = 10.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                Text("tween（补间动画——快进慢出）")
+                AnimateDpExampleRow(
+                    toTarget = toTarget,
+                    animationSpec = tween(
+                        durationMillis = 500
+                    )
+                )
+                Text("tween（补间动画——线性）")
+                AnimateDpExampleRow(
+                    toTarget = toTarget,
+                    animationSpec = tween(
+                        easing = LinearEasing,
+                        durationMillis = 500
+                    )
+                )
+                Text("keyframe（关键帧动画）")
+                AnimateDpExampleRow(
+                    toTarget = toTarget,
+                    animationSpec = if (toTarget) {
+                        keyframes {
+                            durationMillis = 500
+                            0.dp at 0 using LinearOutSlowInEasing // for 0-15 ms
+                            50.dp at 250 using FastOutLinearInEasing // for 15-75 ms
+                            100.dp at 400 // ms
+                            150.dp at 500 // ms
+                        }
+                    } else {
+                        keyframes {
+                            durationMillis = 500
+                            150.dp at 0 using LinearOutSlowInEasing // for 0-15 ms
+                            100.dp at 250 using FastOutLinearInEasing // for 15-75 ms
+                            50.dp at 400 // ms
+                            0.dp at 500 // ms
+                        }
+                    }
+                )
+                Text("spring（弹簧动画）")
+                AnimateDpExampleRow(
+                    toTarget = toTarget,
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioMediumBouncy,
+                        stiffness = Spring.StiffnessLow
+                    )
+                )
+                Text("snap（跳切动画）")
+                AnimateDpExampleRow(
+                    toTarget = toTarget,
+                    animationSpec = snap()
+                )
+            }
+
+            Button(onClick = { toTarget = !toTarget }) {
+                Text("点我开始动画")
+            }
+        }
     }
 
     @Composable
