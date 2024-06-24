@@ -144,7 +144,7 @@ object ValueBasePage {
                     Bloack5()
                 }
                 item("6") {
-                    Bloack6()
+                    Block6()
                 }
                 item("7") {
                     Block7()
@@ -498,7 +498,7 @@ object ValueBasePage {
     }
 
     @Composable
-    private fun Bloack6() {
+    private fun Block6() {
         Column {
             Card {
                 Column(Modifier.padding(10.dp)) {

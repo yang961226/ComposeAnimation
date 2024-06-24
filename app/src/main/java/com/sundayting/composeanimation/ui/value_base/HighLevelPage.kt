@@ -4,17 +4,20 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
@@ -29,6 +32,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -144,6 +148,33 @@ object HighLevelPage {
                         )
                     }
                 }
+
+                item {
+                    HorizontalDivider()
+                }
+
+                item("3") {
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(20.dp)
+                    ) {
+                        Card {
+                            Text(
+                                "📚 animateItemPlacement()，专门为Lazy列表制定的item动画。在Lazy列表中，为item的Modifier链中使用animateItemPlacement()方法，当item的位置发生变化时（或者进场出场），会伴有动画效果。",
+                                style = MaterialTheme.typography.titleMedium,
+                                modifier = Modifier.padding(10.dp)
+                            )
+                        }
+
+                        Image(
+                            painter = painterResource(id = R.drawable.high_3),
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxWidth(),
+                            contentScale = ContentScale.FillWidth
+                        )
+
+                        AnimateItemPlacementExample()
+                    }
+                }
             }
         }
     }
@@ -184,5 +215,49 @@ object HighLevelPage {
                 Text("点我试试")
             }
         }
+    }
+
+    @OptIn(ExperimentalFoundationApi::class)
+    @Composable
+    private fun AnimateItemPlacementExample(
+        modifier: Modifier = Modifier,
+    ) {
+        val list = remember {
+            mutableStateListOf("A", "B", "C", "D", "E")
+        }
+        Column(
+            modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            LazyColumn(
+                Modifier
+                    .fillMaxWidth()
+                    .height(350.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                items(list, key = { it }) {
+                    Card(Modifier.animateItemPlacement()) {
+                        Box(
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(15.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text("我是$it")
+                        }
+                    }
+                }
+            }
+            Spacer(Modifier.height(50.dp))
+
+            Button(onClick = {
+                val newList = list.shuffled()
+                list.clear()
+                list.addAll(newList)
+            }) {
+                Text("打乱顺序")
+            }
+        }
+
     }
 }
