@@ -1,5 +1,6 @@
 package com.sundayting.composeanimation.ui.value_base
 
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.animation.core.Spring
@@ -11,7 +12,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -22,6 +25,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -30,6 +34,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -175,6 +180,35 @@ object HighLevelPage {
                         AnimateItemPlacementExample()
                     }
                 }
+
+                item {
+                    HorizontalDivider()
+                }
+
+                item("4") {
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(20.dp)
+                    ) {
+                        Card {
+                            Text(
+                                "📚 Crossfade()，当需要从2个或多个布局切换的过程中添加渐隐式动画的时候，可以使用这个可组合项",
+                                style = MaterialTheme.typography.titleMedium,
+                                modifier = Modifier.padding(10.dp)
+                            )
+                        }
+                        Text("下面简单看一个Crossfade()的用法，其聚焦于targetState，当不同的target发生变化的时候，Crossfade()会在不同的可组合项切换的中间添加渐隐动画。")
+                        Image(
+                            painter = painterResource(id = R.drawable.high_4),
+                            contentScale = ContentScale.FillWidth,
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+
+                        Text("为了直观体验Crossfade使用前后的区别，下图展现了分别没有使用Crossfade()和不使用Crossfade()的区别：：")
+
+                        CrossfadeExample()
+                    }
+                }
             }
         }
     }
@@ -257,6 +291,99 @@ object HighLevelPage {
             }) {
                 Text("打乱顺序")
             }
+
+            Spacer(Modifier.height(20.dp))
+
+            Card {
+                Text(
+                    "⚠️需要注意的是，为了让动画生效，必须为item使用key，这是让Lazy可组合项能够正确识别item位置的前提。",
+                    modifier = Modifier.padding(10.dp)
+                )
+            }
+        }
+
+    }
+
+
+    @Composable
+    private fun CrossfadeExample(
+        modifier: Modifier = Modifier,
+    ) {
+
+        var changeTag by remember {
+            mutableStateOf(false)
+        }
+
+        Column(
+            modifier = modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(1f)
+            ) {
+
+                Box(
+                    Modifier
+                        .fillMaxSize()
+                        .weight(1f, false),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (changeTag) {
+                        CrossfadeExampleSub1()
+                    } else {
+                        CrossfadeExampleSub2()
+                    }
+                }
+
+                VerticalDivider(Modifier.padding(horizontal = 10.dp))
+
+                Crossfade(
+                    targetState = changeTag, label = "",
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .weight(1f, false),
+                ) { tag ->
+                    if (tag) {
+                        CrossfadeExampleSub1()
+                    } else {
+                        CrossfadeExampleSub2()
+                    }
+                }
+
+            }
+
+            Spacer(Modifier.height(20.dp))
+            Button(onClick = { changeTag = !changeTag }) {
+                Text("点我切换，当前:${changeTag}")
+            }
+        }
+
+    }
+
+    @Composable
+    private fun CrossfadeExampleSub1(
+        modifier: Modifier = Modifier,
+    ) {
+
+        Box(modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+            CircularProgressIndicator()
+        }
+    }
+
+    @Composable
+    private fun CrossfadeExampleSub2(
+        modifier: Modifier = Modifier,
+    ) {
+        Box(
+            Modifier
+                .fillMaxSize()
+                .background(Color.Blue.copy(0.2f)),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(modifier = modifier, text = "加载完了")
         }
 
     }
