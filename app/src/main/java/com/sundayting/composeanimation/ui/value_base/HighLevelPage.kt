@@ -1,13 +1,33 @@
 package com.sundayting.composeanimation.ui.value_base
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.FiniteAnimationSpec
+import androidx.compose.animation.core.InfiniteRepeatableSpec
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.expandIn
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.shrinkHorizontally
+import androidx.compose.animation.shrinkOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,6 +39,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -36,6 +57,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -181,9 +203,7 @@ object HighLevelPage {
                     }
                 }
 
-                item {
-                    HorizontalDivider()
-                }
+                item { HorizontalDivider() }
 
                 item("4") {
                     Column(
@@ -207,6 +227,156 @@ object HighLevelPage {
                         Text("为了直观体验Crossfade使用前后的区别，下图展现了分别没有使用Crossfade()和不使用Crossfade()的区别：：")
 
                         CrossfadeExample()
+                    }
+                }
+
+                item { HorizontalDivider() }
+
+                item("5") {
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(20.dp)
+                    ) {
+                        Card {
+                            Text(
+                                "📚 AnimatedVisibility()，与Crossfade()类似，不同的是这个可组合项聚焦单个可组合项消失\\出场的时候的动画。但是需要注意的是，当Visibility的目标值为false且动画运行结束的时候，其内部的可组合项会真正被移除，而不是单纯不可见。",
+                                style = MaterialTheme.typography.titleMedium,
+                                modifier = Modifier.padding(10.dp)
+                            )
+                        }
+
+                        Image(
+                            painterResource(id = R.drawable.high_5),
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxWidth(),
+                            contentScale = ContentScale.FillWidth
+                        )
+
+                        Text("下面的案例是使用AnimatedVisibility()实现的一个方块隐藏和显示的动画：")
+
+                        AnimatedVisibilityExample()
+
+                        Text("下面的代码是AnimatedVisibility()的使用方式，其中enter和exit指的是对应的可组合项的进场和出场方式，其代码大致如下：")
+
+                        Image(
+                            painterResource(id = R.drawable.high_6),
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxWidth(),
+                            contentScale = ContentScale.FillWidth
+                        )
+
+                        Text("上文提到，AnimatedVisibility()可以指定动画的运行方式，例如入场动画是从左到右，或者从上到下，亦或者是渐隐或渐显，开发者甚至可以合并他们，例如指定一个从上到下而且是渐现的动画，下面简单了解一下开发者可以修改的四种动画方式：")
+
+                        val infiniteTransition = rememberInfiniteTransition(label = "")
+                        val animatedProgress by infiniteTransition.animateFloat(
+                            initialValue = 0f,
+                            targetValue = 1f,
+                            animationSpec = remember {
+                                InfiniteRepeatableSpec(
+                                    animation = tween(easing = LinearEasing, durationMillis = 3000),
+                                    repeatMode = RepeatMode.Restart
+                                )
+                            }, label = ""
+                        )
+
+                        val isVisible by remember {
+                            derivedStateOf { animatedProgress > 0.5f }
+                        }
+
+                        Column(
+                            Modifier.fillMaxWidth(),
+                            verticalArrangement = Arrangement.spacedBy(20.dp)
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    "fade：渐隐和渐显",
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .weight(1f, false)
+                                )
+                                AnimatedVisibilityExample2(
+                                    isVisible = isVisible,
+                                    enterTransition = fadeIn(tween(1000)),
+                                    exitTransition = fadeOut(tween(1000))
+                                )
+                            }
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    "slide：滑入和滑出",
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .weight(1f, false)
+                                )
+                                AnimatedVisibilityExample2(
+                                    isVisible = isVisible,
+                                    enterTransition = slideInHorizontally(tween(1000)) { width -> -width },
+                                    exitTransition = slideOutHorizontally(tween(1000)) { width -> width },
+                                )
+                            }
+
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    "scale：比例大小收缩",
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .weight(1f, false)
+                                )
+                                AnimatedVisibilityExample2(
+                                    isVisible = isVisible,
+                                    enterTransition = scaleIn(tween(1000)),
+                                    exitTransition = scaleOut(tween(1000)),
+                                )
+                            }
+
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    "expand、shrink：展开和收起",
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .weight(1f, false)
+                                )
+                                AnimatedVisibilityExample2(
+                                    isVisible = isVisible,
+                                    enterTransition = expandHorizontally(tween(1000)),
+                                    exitTransition = shrinkHorizontally(tween(1000)),
+                                )
+                            }
+
+                        }
+
+
+                        Text("💡 进场和出场动画不仅仅只有一种，开发者可以合并多个进场动画，使用+号，可以参考以下的方式合并多个动画：")
+
+                        Image(
+                            painterResource(id = R.drawable.high_7),
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxWidth(),
+                            contentScale = ContentScale.FillWidth
+                        )
+
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                "合并滑动和渐显",
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .weight(1f, false)
+                            )
+                            AnimatedVisibilityExample2(
+                                isVisible = isVisible,
+                                enterTransition = fadeIn() + slideInHorizontally { width -> -width },
+                                exitTransition = fadeOut() + slideOutHorizontally { width -> width }
+                            )
+                        }
+
                     }
                 }
             }
@@ -368,7 +538,7 @@ object HighLevelPage {
         modifier: Modifier = Modifier,
     ) {
 
-        Box(modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+        Box(modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             CircularProgressIndicator()
         }
     }
@@ -386,5 +556,95 @@ object HighLevelPage {
             Text(modifier = modifier, text = "加载完了")
         }
 
+    }
+
+    @Composable
+    private fun AnimatedVisibilityExample(
+        modifier: Modifier = Modifier,
+    ) {
+
+        var isVisible by remember {
+            mutableStateOf(false)
+        }
+
+
+        Column(
+            modifier
+                .fillMaxWidth()
+                .height(200.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            AnimatedVisibility(visible = isVisible) {
+                Box(
+                    Modifier
+                        .size(100.dp)
+                        .background(Color.Red.copy(0.5f))
+                )
+            }
+            Box(
+                Modifier
+                    .fillMaxSize()
+                    .weight(1f, false)
+            )
+
+            Spacer(Modifier.height(20.dp))
+            Button(onClick = { isVisible = !isVisible }) {
+                Text("切换")
+            }
+
+        }
+
+    }
+
+    @Composable
+    private fun AnimatedVisibilityExample2(
+        modifier: Modifier = Modifier,
+        isVisible: Boolean,
+        enterTransition: EnterTransition = fadeIn() + expandIn(),
+        exitTransition: ExitTransition = shrinkOut() + fadeOut(),
+    ) {
+        Column(
+            modifier
+                .size(100.dp)
+                .border(1.dp, Color.Red),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            AnimatedVisibility(
+                modifier = modifier,
+                visible = isVisible,
+                enter = enterTransition,
+                exit = exitTransition
+            ) {
+                Column(
+                    Modifier
+                        .size(100.dp)
+                ) {
+                    Box(
+                        Modifier
+                            .fillMaxSize()
+                            .weight(1f, false)
+                            .background(Color.Red.copy(0.2f))
+                    )
+                    Box(
+                        Modifier
+                            .fillMaxSize()
+                            .weight(1f, false)
+                            .background(Color.Blue.copy(0.2f))
+                    )
+                    Box(
+                        Modifier
+                            .fillMaxSize()
+                            .weight(1f, false)
+                            .background(Color.Green.copy(0.2f))
+                    )
+                    Box(
+                        Modifier
+                            .fillMaxSize()
+                            .weight(1f, false)
+                            .background(Color.Magenta.copy(0.2f))
+                    )
+                }
+            }
+        }
     }
 }
