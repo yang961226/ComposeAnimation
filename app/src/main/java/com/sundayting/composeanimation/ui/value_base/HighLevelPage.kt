@@ -1,9 +1,11 @@
 package com.sundayting.composeanimation.ui.value_base
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.animation.core.InfiniteRepeatableSpec
@@ -11,6 +13,7 @@ import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
@@ -24,10 +27,13 @@ import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.animation.shrinkOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -44,6 +50,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Call
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
@@ -57,8 +64,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -68,10 +77,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.sundayting.composeanimation.R
+import kotlinx.coroutines.delay
 
 object HighLevelPage {
 
@@ -379,6 +390,65 @@ object HighLevelPage {
 
                     }
                 }
+
+                item { HorizontalDivider() }
+
+                item("6") {
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(20.dp)
+                    ) {
+                        Card {
+                            Text(
+                                "📚 AnimatedContent()——定制化更高的强化版Crossfade()，不仅可以渐显渐隐，还可以定制任意的转移动画。",
+                                style = MaterialTheme.typography.titleMedium,
+                                modifier = Modifier.padding(10.dp)
+                            )
+                        }
+
+                        Image(
+                            painter = painterResource(id = R.drawable.high_14),
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxWidth(),
+                            contentScale = ContentScale.FillWidth
+                        )
+
+                        Text("AnimatedContent()的Api设计和AnimatedVisibility()非常类似，开发者需要关注的是targetState和transitionSpec，其中transitionSpec是决定不同状态之间动画转移的方式，下图展示的是渐隐渐显+平移的方式：")
+
+                        AnimatedContentExample()
+
+                        Text("💡AnimateContent()的transitionSpec看起来稍微有点复杂，核心是决定入场和离场动画，先让我们回顾一下AnimatedVisibility()的设计：")
+
+                        Image(
+                            painter = painterResource(id = R.drawable.high_15),
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxWidth(),
+                            contentScale = ContentScale.FillWidth
+                        )
+
+                        Text("可以看出，在AnimatedVisibility()中开发者需要指定在两个参数中分别指定入场和离场动画，而在AnimateContent()中，开发者只需要通过一个参数transitionSpec指定，入场动画和离场动画通过一个中缀表达式「togetherWith」来拼凑它们即可。")
+
+                        Image(
+                            painter = painterResource(id = R.drawable.high_16),
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxWidth(),
+                            contentScale = ContentScale.FillWidth
+                        )
+
+                        Text("💡transitionSpec还可以使用using中缀表达式接入SizeTransform，这样可以定制切换过程中的Size变化，下图的代码实现了先让宽度达到最大，然后再继续展开高度的代码：")
+
+                        Image(
+                            painter = painterResource(id = R.drawable.high_17),
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxWidth(),
+                            contentScale = ContentScale.FillWidth
+                        )
+
+                        AnimatedContentExample2()
+
+
+                    }
+                }
+
             }
         }
     }
@@ -646,5 +716,106 @@ object HighLevelPage {
                 }
             }
         }
+    }
+
+    @Composable
+    private fun AnimatedContentExample(
+        modifier: Modifier = Modifier,
+    ) {
+
+        var index by remember {
+            mutableIntStateOf(0)
+        }
+
+        LaunchedEffect(Unit) {
+            while (true) {
+                delay(2000)
+                index = (index + 1) % 3
+            }
+        }
+
+        AnimatedContent(
+            targetState = index,
+            modifier = modifier
+                .fillMaxWidth()
+                .aspectRatio(4f / 3f), label = "",
+            transitionSpec = {
+                fadeIn() + slideInHorizontally { width -> width } togetherWith fadeOut() + slideOutHorizontally { width -> -width }
+            }
+        ) { i ->
+            Image(
+                painter = painterResource(
+                    id = when (i) {
+                        0 -> R.drawable.high_10
+                        1 -> R.drawable.high_11
+                        2 -> R.drawable.high_12
+                        else -> R.drawable.high_13
+                    }
+                ),
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
+        }
+
+    }
+
+    @Composable
+    private fun AnimatedContentExample2(
+        modifier: Modifier = Modifier,
+    ) {
+
+        var expanded by remember { mutableStateOf(false) }
+
+        Box(modifier.height(400.dp)) {
+            Card(
+                modifier = Modifier
+                    .clickable(
+                        interactionSource = remember {
+                            MutableInteractionSource()
+                        },
+                        indication = null
+                    ) { expanded = !expanded }
+            ) {
+                AnimatedContent(
+                    modifier = Modifier.padding(10.dp),
+                    targetState = expanded,
+                    transitionSpec = {
+                        (fadeIn(
+                            tween(durationMillis = 300)
+                        ) togetherWith fadeOut(
+                            tween(durationMillis = 300)
+                        )) using SizeTransform { initSize, targetSize ->
+                            //如果是展开的情况，在动画进行到一半之前，高度保持不变，让宽度变化
+                            if (targetState) {
+                                keyframes {
+                                    IntSize(targetSize.width, initSize.height) at 150
+                                    durationMillis = 300
+                                }
+                            }
+                            //如果是收缩的情况，在动画进行一半之前，宽度保持不变，让高度变化
+                            else {
+                                keyframes {
+                                    IntSize(initSize.width, targetSize.height) at 150
+                                    durationMillis = 300
+                                }
+                            }
+                        }
+                    },
+                    label = ""
+                ) { targetExpanded ->
+                    if (targetExpanded) {
+                        Text(
+                            "话说是日贾敬的寿辰，贾珍先将上等可吃的东西、稀奇些的果品，装了十六大捧盒，着贾蓉带领家下人等与贾敬送去，向贾蓉说道：“你留神看太爷喜欢不喜欢，你就行了礼来。你说：‘我父亲遵太爷的话未敢来，在家里率领合家都朝上行了礼了。’”贾蓉听罢，即率领家人去了。这里渐渐的就有人来了。先是贾琏、贾蔷到来，先看了各处的座位，并问：“有什么玩意儿没有？”家人答道：“我们爷原算计请太爷今日来家，所以并未敢预备顽意儿。前日，听见太爷又不来了，现叫奴才们找了一班小戏儿并一档子打十番的，都在园子里戏台上预备着呢。”",
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    } else {
+                        Icon(imageVector = Icons.Default.Call, contentDescription = null)
+                    }
+                }
+            }
+
+        }
+
     }
 }
