@@ -77,9 +77,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.sundayting.composeanimation.R
 import kotlinx.coroutines.delay
@@ -446,6 +448,23 @@ object HighLevelPage {
                         AnimatedContentExample2()
 
 
+                    }
+                }
+
+                item { HorizontalDivider() }
+
+                item("7"){
+                    Card {
+                        Column(
+                            Modifier.padding(10.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text("🎉", style = TextStyle(fontSize = 50.sp))
+                            Text("恭喜你读者，你已经完成这一节的所有内容，请根据本章的代码案例自行练习，或者返回并阅读下一章的内容")
+                            Button(onClick = { navHostController.popBackStack() }) {
+                                Text("返回")
+                            }
+                        }
                     }
                 }
 

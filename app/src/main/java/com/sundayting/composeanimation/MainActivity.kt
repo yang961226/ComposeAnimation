@@ -15,6 +15,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.sundayting.composeanimation.ui.main.MainPage
 import com.sundayting.composeanimation.ui.value_base.AnimatablePage
+import com.sundayting.composeanimation.ui.value_base.ExamplePage
 import com.sundayting.composeanimation.ui.value_base.HighLevelPage
 import com.sundayting.composeanimation.ui.value_base.TransitionPage
 import com.sundayting.composeanimation.ui.value_base.ValueBasePage
@@ -88,6 +89,14 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
+
+                        composable(
+                            ExamplePage.ROUTE
+                        ){
+                            ExamplePage.Screen(
+                                navHostController = navHostController
+                            )
+                        }
                     }
                 }
 

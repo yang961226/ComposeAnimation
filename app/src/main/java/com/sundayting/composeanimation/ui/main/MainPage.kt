@@ -70,6 +70,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.sundayting.composeanimation.R
 import com.sundayting.composeanimation.ui.value_base.AnimatablePage
+import com.sundayting.composeanimation.ui.value_base.ExamplePage
 import com.sundayting.composeanimation.ui.value_base.HighLevelPage
 import com.sundayting.composeanimation.ui.value_base.TransitionPage
 import com.sundayting.composeanimation.ui.value_base.ValueBasePage
@@ -340,8 +341,13 @@ object MainPage {
                     })
                 }
                 item(key = "高级动画概览") {
-                    CategoriesItem(title = { Text("动画Modifier、\n动画可组合项") }, onClick = {
+                    CategoriesItem(title = { Text("高级动画概览") }, onClick = {
                         navHostController.navigate(HighLevelPage.ROUTE)
+                    })
+                }
+                item(key = "案例") {
+                    CategoriesItem(title = { Text("案例") }, onClick = {
+                        navHostController.navigate(ExamplePage.ROUTE)
                     })
                 }
             }
