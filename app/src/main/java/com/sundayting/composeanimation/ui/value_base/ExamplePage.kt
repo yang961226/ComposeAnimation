@@ -27,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.sundayting.composeanimation.ui.value_base.example.CarouselPage
 import com.sundayting.composeanimation.ui.value_base.example.ExplodePage
 import com.sundayting.composeanimation.ui.value_base.example.FloatingWindowPage
 
@@ -84,6 +85,16 @@ object ExamplePage {
                     }
                 }
 
+                item {
+                    ExampleItem(
+                        onClick = {
+                            navHostController.navigate(CarouselPage.ROUTE)
+                        }
+                    ) {
+                        Text("展示墙场景：在不同的图片之间添加顺滑的渐变动画，图片本身有横移效果。")
+                    }
+                }
+
             }
         }
 
@@ -124,7 +135,9 @@ object ExamplePage {
                 Icon(
                     imageVector = Icons.Default.PlayArrow,
                     contentDescription = null,
-                    modifier = Modifier.padding(start = 10.dp).size(30.dp)
+                    modifier = Modifier
+                        .padding(start = 10.dp)
+                        .size(30.dp)
                 )
             }
         }
