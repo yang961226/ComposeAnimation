@@ -1,7 +1,10 @@
 package com.sundayting.composeanimation.ui.value_base.example
 
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.VisibilityThreshold
 import androidx.compose.animation.core.animateIntOffsetAsState
+import androidx.compose.animation.core.snap
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -10,13 +13,17 @@ import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -58,7 +65,7 @@ object FloatingWindowPage {
     ) {
         Scaffold(modifier, topBar = {
             TopAppBar(
-                title = { Text("浮窗") },
+                title = { Text("浮窗场景") },
                 navigationIcon = {
                     IconButton(onClick = { navHostController.popBackStack() }) {
                         Icon(Icons.AutoMirrored.Default.ArrowBack, contentDescription = null)
@@ -72,6 +79,34 @@ object FloatingWindowPage {
                     .padding(paddingValues),
             ) {
 
+                var isSpring by remember {
+                    mutableStateOf(true)
+                }
+
+                Column(
+                    Modifier
+                        .align(Alignment.Center)
+                        .padding(50.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Card {
+                        Text(
+                            """
+                    场景：浮窗悬浮在屏幕周围，通过拖动（或长按后拖动）来控制悬浮窗的位移，松手后根据实际场景回归到屏幕边缘
+                    
+                    要点：使用animateIntOffsetAsState()来控制浮窗的位移，其默认动画规范为spring，给浮窗的位移提供了少许「滞后」感，提高了浮窗的物理感。
+                """.trimIndent(), modifier = Modifier
+
+                                .padding(10.dp)
+                        )
+                    }
+                    Spacer(Modifier.height(20.dp))
+
+                    Button(onClick = { isSpring = !isSpring }) {
+                        Text("当前动画规范：${if (isSpring) "spring" else "线性"}")
+                    }
+                }
+
                 val density = LocalDensity.current
 
                 val windowWidthPx = with(density) {
@@ -79,38 +114,48 @@ object FloatingWindowPage {
                 }
 
                 val maxWidthPx = with(density) { maxWidth.roundToPx() }
-
+                val maxHeightPx = with(density) { maxHeight.roundToPx() }
 
                 var offset by remember(density) {
                     mutableStateOf(IntOffset(0, with(density) { ((-100).dp).roundToPx() }))
                 }
 
-                val floatingWindowCenterX by rememberUpdatedState(newValue = offset.x - windowWidthPx / 2 + with(density) { maxWidth.roundToPx() })
+                val floatingWindowCenterX by rememberUpdatedState(
+                    newValue = offset.x - windowWidthPx / 2 + with(
+                        density
+                    ) { maxWidth.roundToPx() })
 
-                Column(
-                    Modifier.align(Alignment.Center),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text("maxWidth:${maxWidthPx}")
-                    Text("maxWidth一半:${maxWidthPx / 2}")
-                    Text("floatingWindowCenterX:${floatingWindowCenterX}")
-                }
-
-                fun moveToInitDest() {
+                //移动到屏幕侧边
+                fun onDragEndOrStop() {
                     offset = if (floatingWindowCenterX > (maxWidthPx / 2)) {
                         //当前浮窗在屏幕右边
-                        offset.copy(x = 0)
+                        offset.copy(
+                            x = 0,
+                            offset.y.coerceIn(
+                                minimumValue = -maxHeightPx + with(density) { 100.dp.roundToPx() },
+                                maximumValue = 0
+                            )
+                        )
                     } else {
                         //当前浮窗在屏幕左边
-                        offset.copy(x = with(density) {
-                            -maxWidth.roundToPx() + windowWidthPx
-                        })
+                        offset.copy(
+                            x = with(density) {
+                                -maxWidth.roundToPx() + windowWidthPx
+                            },
+                            offset.y.coerceIn(
+                                minimumValue = -maxHeightPx + with(density) { 100.dp.roundToPx() },
+                                maximumValue = 0
+                            )
+                        )
                     }
                 }
 
                 val animatedOffset by animateIntOffsetAsState(
                     targetValue = offset,
                     label = "",
+                    animationSpec = if (isSpring) spring(
+                        visibilityThreshold = IntOffset.VisibilityThreshold
+                    ) else snap()
                 )
                 var isDragging by remember {
                     mutableStateOf(false)
@@ -127,11 +172,11 @@ object FloatingWindowPage {
                                 },
                                 onDragCancel = {
                                     isDragging = false
-                                    moveToInitDest()
+                                    onDragEndOrStop()
                                 },
                                 onDragEnd = {
                                     isDragging = false
-                                    moveToInitDest()
+                                    onDragEndOrStop()
                                 },
                                 onDragStart = {
                                     isDragging = true
