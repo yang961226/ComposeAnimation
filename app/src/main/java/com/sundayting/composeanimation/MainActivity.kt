@@ -19,6 +19,7 @@ import com.sundayting.composeanimation.ui.value_base.ExamplePage
 import com.sundayting.composeanimation.ui.value_base.HighLevelPage
 import com.sundayting.composeanimation.ui.value_base.TransitionPage
 import com.sundayting.composeanimation.ui.value_base.ValueBasePage
+import com.sundayting.composeanimation.ui.value_base.example.ExplodePage
 import com.sundayting.composeanimation.ui.value_base.example.FloatingWindowPage
 
 class MainActivity : ComponentActivity() {
@@ -103,6 +104,14 @@ class MainActivity : ComponentActivity() {
                             FloatingWindowPage.ROUTE
                         ) {
                             FloatingWindowPage.Screen(
+                                navHostController = navHostController
+                            )
+                        }
+
+                        composable(
+                            ExplodePage.ROUTE
+                        ){
+                            ExplodePage.Screen(
                                 navHostController = navHostController
                             )
                         }

@@ -27,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.sundayting.composeanimation.ui.value_base.example.ExplodePage
 import com.sundayting.composeanimation.ui.value_base.example.FloatingWindowPage
 
 object ExamplePage {
@@ -70,6 +71,16 @@ object ExamplePage {
                         }
                     ) {
                         Text("悬浮窗场景：拖动（或长按拖动）悬浮窗，松手后悬浮窗回归到屏幕边缘，带有拟真的「滞后感」")
+                    }
+                }
+
+                item {
+                    ExampleItem(
+                        onClick = {
+                            navHostController.navigate(ExplodePage.ROUTE)
+                        }
+                    ) {
+                        Text("「爆炸」、「弹性」场景：模拟某个东西发生了爆炸或者收到压迫后发生反弹，但最终会回归到初始状态。")
                     }
                 }
 
