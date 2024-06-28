@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.sundayting.composeanimation.ui.value_base.example.CarouselPage
 import com.sundayting.composeanimation.ui.value_base.example.ExplodePage
+import com.sundayting.composeanimation.ui.value_base.example.FloatingToolPage
 import com.sundayting.composeanimation.ui.value_base.example.FloatingWindowPage
 
 object ExamplePage {
@@ -72,6 +73,16 @@ object ExamplePage {
                         }
                     ) {
                         Text("悬浮窗场景：拖动（或长按拖动）悬浮窗，松手后悬浮窗回归到屏幕边缘，带有拟真的「滞后感」")
+                    }
+                }
+
+                item {
+                    ExampleItem(
+                        onClick = {
+                            navHostController.navigate(FloatingToolPage.ROUTE)
+                        }
+                    ) {
+                        Text("悬浮工具栏场景：拖动工具栏，不同的按钮之间「拖曳感」")
                     }
                 }
 
