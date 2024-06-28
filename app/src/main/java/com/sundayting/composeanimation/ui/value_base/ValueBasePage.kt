@@ -149,7 +149,7 @@ object ValueBasePage {
                 item("7") {
                     Block7()
                 }
-                item{
+                item {
                     HorizontalDivider()
                 }
                 item("8") {
@@ -324,7 +324,7 @@ object ValueBasePage {
                     .horizontalScroll(rememberScrollState()),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("阻尼比：")
+                Text("阻尼比(弹性)：")
                 RadioButton(
                     selected = dampingRatioType == 0,
                     onClick = { dampingRatioType = 0 },
@@ -533,7 +533,15 @@ object ValueBasePage {
                                 """.trimIndent(),
                 modifier = Modifier.align(Alignment.Start)
             )
-            Text("tween的参数中，值得一提的是easing参数，这是补间动画的核心，它决定了补间动画的时间与运行速率的关系，下面从代码上解释：")
+
+            Card(Modifier.padding(vertical = 20.dp)) {
+                Text(
+                    "⚠️需要注意的是，Easing的命名是以符合大众认知的、先入场再出场为顺序，但是入场动画叫Out，出场动画叫In，这里笔者理解为「上一个动画的出场为Out，下一个动画的进场为In」，因此FastOutSlowIn可以理解为先快后慢。",
+                    modifier = Modifier.padding(10.dp)
+                )
+            }
+
+            Text("tween的参数中，值得一提的是easing参数，这是补间动画的核心，它决定了补间动画的时间与进度的关系，下面从代码上解释：")
             Image(
                 painter = painterResource(id = R.drawable.valuebase_3_4),
                 contentDescription = null,
@@ -668,7 +676,7 @@ object ValueBasePage {
             }
 
             Text(
-                "动画规格（Spec）影响了动画在往目标值移动的过程中的具体运行逻辑，不同的Spec可以让动画产生不同的效果，下面通过实际案例看看他们的差异"
+                "动画规格（Spec）影响了动画在往目标值移动的过程中的具体运行逻辑，不同的Spec基于不同的数学模型，下面是一些不同Spec实现的平移动画案例："
             )
 
             var toTarget by remember {

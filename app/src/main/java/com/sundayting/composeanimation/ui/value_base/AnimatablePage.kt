@@ -1,6 +1,5 @@
 package com.sundayting.composeanimation.ui.value_base
 
-import androidx.compose.animation.Animatable
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.VectorConverter
 import androidx.compose.foundation.Image
@@ -46,7 +45,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.sundayting.composeanimation.R
-import kotlinx.coroutines.delay
 
 object AnimatablePage {
 
@@ -81,8 +79,8 @@ object AnimatablePage {
                 verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
                 item("1") {
-                    Column {
-                        Card(Modifier.padding(vertical = 10.dp)) {
+                    Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
+                        Card {
                             Column(
                                 modifier = Modifier.padding(10.dp),
                                 horizontalAlignment = Alignment.CenterHorizontally
@@ -94,7 +92,7 @@ object AnimatablePage {
                             }
                         }
 
-                        Text("通过查看animateValueAsState的源码来确认这一点：")
+                        Text("通过查看animateValueAsState的源码来确认这一点，可以看出，animateValueAsState()实际上是使用Animatable来实现的：")
                         Image(
                             painterResource(id = R.drawable.animatable_2),
                             contentDescription = null,
@@ -102,6 +100,47 @@ object AnimatablePage {
                                 .fillMaxWidth()
                                 .padding(vertical = 10.dp),
                             contentScale = ContentScale.FillWidth
+                        )
+                    }
+                }
+                item{
+                    HorizontalDivider()
+                }
+                item("2"){
+                    Column(verticalArrangement = Arrangement.spacedBy(20.dp)){
+                        Card {
+                            Column(
+                                modifier = Modifier.padding(10.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(
+                                    "📚 下面看看Animatable的api的设计，需要注意的是，Animatable是一个类，开发者需要调用它的animateTo()方法才能使它执行动画",
+                                    style = MaterialTheme.typography.titleMedium,
+                                )
+                            }
+                        }
+
+                        Text("下图展示的是Animatable类的源码：")
+
+                        Image(
+                            painter = painterResource(id = R.drawable.animatable_5),
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxWidth(),
+                            contentScale = ContentScale.FillWidth
+                        )
+
+                        Text(
+                            """
+                
+                💡「initialValue」表示动画的初始值，这是与animate*AsState()最大不同的地方，Animatable需要写入动画的初始值。
+                
+                💡「typeConverter」 上一章已经解释，为了给不同类型的动画适配，需要一个转换器将其他的类转成底层的浮点类型。
+                
+                💡「visibilityThreshold 」可见阈值，当动画低于当前阈值时自动停下，避免性能浪费。
+                
+                💡「label」 这个参数是为了区别在 Android Studio 中进行动画预览时，区别其它动画的。
+                
+            """.trimIndent()
                         )
 
                         Text("让我们简单看一下这个Api的使用，下面代码创建了一个Dp类型的Animatable")
@@ -123,8 +162,6 @@ object AnimatablePage {
 
                         Text("\n 🚀下面给一个基于Animatable实现的圆角变化的动画及其源代码")
 
-
-
                         AnimatableExample(
                             Modifier.padding(vertical = 10.dp)
                         )
@@ -142,7 +179,10 @@ object AnimatablePage {
                         Spacer(Modifier.height(20.dp))
 
                         Card {
-                            Column(Modifier.padding(10.dp)) {
+                            Column(
+                                Modifier.padding(10.dp),
+                                verticalArrangement = Arrangement.spacedBy(20.dp)
+                            ) {
                                 Text("那么开发者应该在何时使用这个更加底层的api呢？")
                                 Image(
                                     painterResource(id = R.drawable.animatable_1),
@@ -152,24 +192,15 @@ object AnimatablePage {
                                         .size(100.dp)
                                         .align(Alignment.CenterHorizontally),
                                 )
+                                Text("要回答这个问题，我们先回到animate*AsState()本身，其实这个api就是对Animatable的「场景化封装」，这里指的是「不同状态下切换」的场景，当开发者需要面临的情况是状态不明确，亦或是开始状态和结束状态均为一致的这种例外情况，使用这个api将会导致开发者陷入困境，因此开发者需要使用更底层的api来解决他们的问题")
                             }
                         }
-
-                        Spacer(Modifier.height(20.dp))
-
-                        Text("在进一步探讨之前，我们先回顾一下animate*AsState()这个api，开发者是通过切换它的「目标值」来启动动画的，也就是说，当开发所需的场景是「在不同状态之间切换时，需要动画过渡」下的时候，用animate*AsState()可以非常方便开发者去实现，实际上这个api就是为了针对这个场景对Animatable进行了封装。")
-
-                        Text("\n但是某些场景下并不是状态之间的切换，而是「包含了更为复杂的因素」时，用animate*AsState()会比较困难，例如「等待2秒后，再实现状态A到状态B的迁移」这种场景再去使用animate*AsState()会比较棘手。\n\n这个场景下开发者使用更为底层的Animatable则比较方便，下面的案例是一个等待1秒后才会变色的案例，实现也非常简单，只需要在协程启动时delay一秒即可。")
-
-                        AnimatableExample2(
-                            Modifier.padding(vertical = 10.dp)
-                        )
                     }
                 }
-                item{
+                item {
                     HorizontalDivider()
                 }
-                item("2"){
+                item("结束") {
                     Card {
                         Column(
                             Modifier.padding(10.dp),
@@ -223,42 +254,4 @@ object AnimatablePage {
             Button(onClick = { big = !big }) { Text("点我变化") }
         }
     }
-
-    @Composable
-    private fun AnimatableExample2(
-        modifier: Modifier = Modifier,
-    ) {
-
-        var tag by remember {
-            mutableStateOf(false)
-        }
-
-        val dpAnimatable = remember {
-            Animatable(Color.Red.copy(0.2f))
-        }
-
-        LaunchedEffect(tag) {
-            delay(1000L)
-            dpAnimatable.animateTo(
-                if (tag) Color.Blue.copy(0.2f) else Color.Red.copy(0.2f)
-            )
-        }
-
-        Column(
-            modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Box(
-                Modifier
-                    .padding(20.dp)
-                    .size(100.dp)
-                    .background(
-                        dpAnimatable.value,
-                    )
-            )
-
-            Button(onClick = { tag = !tag }) { Text("点我1秒后变化") }
-        }
-    }
-
 }
