@@ -1,5 +1,6 @@
 package com.sundayting.composeanimation.ui.main
 
+import android.content.Intent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.InfiniteRepeatableSpec
 import androidx.compose.animation.core.LinearEasing
@@ -34,6 +35,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.sharp.KeyboardArrowDown
 import androidx.compose.material.ripple.rememberRipple
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
@@ -60,6 +62,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -67,6 +70,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import androidx.navigation.NavHostController
 import com.sundayting.composeanimation.R
 import com.sundayting.composeanimation.ui.value_base.AnimatablePage
@@ -349,6 +353,112 @@ object MainPage {
                     CategoriesItem(title = { Text("案例") }, onClick = {
                         navHostController.navigate(ExamplePage.ROUTE)
                     })
+                }
+                item(key = "我想学Compose") {
+                    ElevatedCard {
+                        var expandMore by remember {
+                            mutableStateOf(false)
+                        }
+                        Box(Modifier.fillMaxWidth()) {
+
+                            val buttonRotateAngle by animateFloatAsState(
+                                targetValue = if (expandMore) 180f else 0f,
+                                label = ""
+                            )
+                            Image(
+                                painter = painterResource(id = R.drawable.main_page_3),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .aspectRatio(4f / 2f)
+                                    .clip(CardDefaults.elevatedShape)
+                                    .shadow(elevation = 5.dp),
+                                contentScale = ContentScale.Crop
+                            )
+
+                            Box(
+                                Modifier
+                                    .matchParentSize()
+                                    .background(
+                                        Brush.verticalGradient(
+                                            listOf(
+                                                Color.Transparent, Color.Black.copy(0.4f)
+                                            )
+                                        )
+                                    )
+                            )
+
+                            val titleTransition = rememberInfiniteTransition(label = "")
+                            val titleOffset by titleTransition.animateValue(
+                                initialValue = 0.dp,
+                                targetValue = 25.dp,
+                                typeConverter = Dp.VectorConverter,
+                                animationSpec = remember {
+                                    InfiniteRepeatableSpec(
+                                        animation = tween(durationMillis = 2_000),
+                                        repeatMode = RepeatMode.Reverse
+                                    )
+                                }, label = ""
+                            )
+                            Row(
+                                Modifier
+                                    .fillMaxWidth()
+                                    .align(Alignment.BottomCenter)
+                                    .padding(10.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = "觉得Compose入门太难？👉🏻",
+                                    modifier = Modifier
+                                        .offset {
+                                            IntOffset(titleOffset.roundToPx(), 0)
+                                        },
+                                    style = TextStyle(
+                                        fontSize = 20.sp,
+                                        color = MaterialTheme.colorScheme.inverseOnSurface
+                                    )
+                                )
+                                Spacer(
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .weight(1f, false)
+                                )
+                                FilledIconButton(
+                                    onClick = { expandMore = !expandMore },
+                                    modifier = Modifier.graphicsLayer {
+                                        rotationZ = buttonRotateAngle
+                                    }
+                                ) {
+                                    Icon(Icons.Sharp.KeyboardArrowDown, contentDescription = null)
+                                }
+                            }
+                        }
+                        AnimatedVisibility(visible = expandMore) {
+                            CompositionLocalProvider(
+                                LocalTextStyle provides MaterialTheme.typography.bodyMedium.copy(
+                                    color = MaterialTheme.colorScheme.secondary
+                                )
+                            ) {
+                                Column(Modifier.padding(10.dp), horizontalAlignment = Alignment.End) {
+                                    Text(
+                                        modifier = Modifier.padding(vertical = 10.dp),
+                                        text = "一个适合安卓程序员的Compose教程，这里有基础的Modifier理论与使用，有基础组件的使用，也有Compose新手入门难点「重组」、「状态」、「副作用」的详细教程，更有动画、手势、高级组件使用等详细教程，学员均可加入学习群与许许多多的同好一起交流心得~",
+                                        style = MaterialTheme.typography.titleMedium
+                                    )
+                                    val context = LocalContext.current
+                                    Button(onClick = {
+                                        context.startActivity(
+                                            Intent(Intent.ACTION_VIEW).setData("https://www.bilibili.com/cheese/play/ep1448106".toUri())
+                                        )
+                                    }) {
+                                        Text("立即加入", color = Color.White)
+                                    }
+                                }
+                            }
+
+                        }
+
+                    }
                 }
             }
         }
